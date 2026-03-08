@@ -1,6 +1,12 @@
 import { Task } from "@/types/task";
 
 const STORAGE_KEY = "collegemate-tasks";
+const STREAK_KEY = "collegemate-streak";
+
+export interface StreakData {
+  current: number;
+  lastCompletionDate: string | null;
+}
 
 export function loadTasks(): Task[] {
   try {
@@ -12,6 +18,51 @@ export function loadTasks(): Task[] {
 
 export function saveTasks(tasks: Task[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+export function loadStreak(): StreakData {
+  try {
+    const data = JSON.parse(localStorage.getItem(STREAK_KEY) || "null");
+    if (data && typeof data.current === "number") return data;
+  } catch {}
+  return { current: 0, lastCompletionDate: null };
+}
+
+function todayStr() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function yesterdayStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split("T")[0];
+}
+
+export function recordCompletion(): StreakData {
+  const streak = loadStreak();
+  const today = todayStr();
+
+  if (streak.lastCompletionDate === today) return streak;
+
+  if (streak.lastCompletionDate === yesterdayStr() || streak.lastCompletionDate === today) {
+    streak.current += 1;
+  } else {
+    streak.current = 1;
+  }
+  streak.lastCompletionDate = today;
+  localStorage.setItem(STREAK_KEY, JSON.stringify(streak));
+  return streak;
+}
+
+export function refreshStreak(): StreakData {
+  const streak = loadStreak();
+  const today = todayStr();
+  const yesterday = yesterdayStr();
+  if (streak.lastCompletionDate !== today && streak.lastCompletionDate !== yesterday) {
+    streak.current = 0;
+    localStorage.setItem(STREAK_KEY, JSON.stringify(streak));
+  }
+  return streak;
 }
 
 export function getAiSuggestion(tasks: Task[]): string {
