@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
@@ -28,6 +28,7 @@ const Index = () => {
   const [priority, setPriority] = useState<Task["priority"]>("High");
   const [category, setCategory] = useState<string>("Assignment");
   const [filterCategory, setFilterCategory] = useState<string>("All");
+  const [sortBy, setSortBy] = useState<"date" | "priority" | "category">("date");
   const { allCategoryNames } = useCategories();
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
@@ -170,8 +171,18 @@ const Index = () => {
 
   const reminders = useTaskReminders(tasks);
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
-  const pending = filtered.filter((t) => !t.completed);
-  const completed = filtered.filter((t) => t.completed);
+
+  const priorityOrder: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
+  const sortTasks = (list: Task[]) => {
+    return [...list].sort((a, b) => {
+      if (sortBy === "date") return a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "");
+      if (sortBy === "priority") return priorityOrder[a.priority] - priorityOrder[b.priority];
+      return a.category.localeCompare(b.category);
+    });
+  };
+
+  const pending = sortTasks(filtered.filter((t) => !t.completed));
+  const completed = sortTasks(filtered.filter((t) => t.completed));
 
   const scrollToApp = () => {
     appRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -326,6 +337,25 @@ const Index = () => {
             >
               <Settings size={14} />
             </button>
+          </div>
+
+          {/* Sort Bar */}
+          <div className="mb-4 flex items-center gap-2">
+            <ArrowUpDown size={14} className="text-primary-foreground/70" />
+            <span className="text-xs text-primary-foreground/70">Sort:</span>
+            {(["date", "priority", "category"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setSortBy(s)}
+                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-all ${
+                  sortBy === s
+                    ? "bg-card text-foreground shadow-card"
+                    : "bg-primary-foreground/10 text-primary-foreground/80 hover:bg-primary-foreground/20"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
           </div>
 
           {/* Reminders */}
