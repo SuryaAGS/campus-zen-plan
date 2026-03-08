@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, GraduationCap, ArrowDown, Filter } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun } from "lucide-react";
 import mascot from "@/assets/mascot.png";
 import { Task, CATEGORIES, Category } from "@/types/task";
 import { loadTasks, saveTasks, getAiSuggestion, autoReschedule, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
