@@ -62,7 +62,7 @@ const Index = () => {
       if (!task.completed && new Date(task.date) < today) {
         task.date = tomorrowStr;
         updates.push(
-          supabase.from("tasks").update({ date: tomorrowStr }).eq("id", task.id)
+          supabase.from("tasks").update({ date: tomorrowStr }).eq("id", task.id).then()
         );
       }
       return task;
