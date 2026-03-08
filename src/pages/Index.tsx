@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
