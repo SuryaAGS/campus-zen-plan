@@ -59,7 +59,6 @@ export default function Auth() {
         <h2 className="mb-6 text-center font-display text-xl font-semibold text-card-foreground">
           {isForgot ? "Reset your password" : isLogin ? "Welcome back!" : "Create your account"}
         </h2>
-        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "signup" && (
