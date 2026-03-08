@@ -12,6 +12,7 @@ import Categories from "./pages/Categories";
 import CalendarView from "./pages/CalendarView";
 import Install from "./pages/Install";
 import ResetPassword from "./pages/ResetPassword";
+import NotificationSettings from "./pages/NotificationSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
