@@ -71,7 +71,7 @@ const TaskManager = () => {
       });
 
       if (overdue.length > 0) {
-        const updates: Promise<any>[] = [];
+        const updates: Array<PromiseLike<any>> = [];
 
         for (const task of overdue) {
           const newMissedCount = task.missedCount + 1;
