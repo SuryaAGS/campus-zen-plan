@@ -66,6 +66,7 @@ async function sendBrowserNotification(title: string, body: string) {
 
 const SESSION_KEY = "collegemate-notified-session";
 const TIME_NOTIFIED_KEY = "collegemate-time-notified";
+const TIME_5MIN_NOTIFIED_KEY = "collegemate-time-5min-notified";
 
 function hasNotifiedThisSession(): boolean {
   return sessionStorage.getItem(SESSION_KEY) === "true";
