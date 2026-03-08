@@ -20,7 +20,7 @@ function getTasksDueSoon(tasks: Task[]) {
 function getTasksDueSoonByTime(tasks: Task[]) {
   const now = new Date();
   const nowMs = now.getTime();
-  const FIFTEEN_MIN = 15 * 60 * 1000;
+  const FIVE_MIN = 5 * 60 * 1000;
 
   const dueSoon: Task[] = [];
   for (const t of tasks) {
@@ -28,7 +28,7 @@ function getTasksDueSoonByTime(tasks: Task[]) {
     const taskDateTime = new Date(`${t.date}T${t.time}`);
     if (isNaN(taskDateTime.getTime())) continue;
     const diff = taskDateTime.getTime() - nowMs;
-    if (diff <= FIFTEEN_MIN && diff >= -60_000) {
+    if (diff <= FIVE_MIN && diff >= -FIVE_MIN) {
       dueSoon.push(t);
     }
   }
