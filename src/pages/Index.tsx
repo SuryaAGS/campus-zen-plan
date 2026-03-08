@@ -248,6 +248,13 @@ const Index = () => {
       {/* Controls - Right */}
       <div className="fixed right-2 top-2 z-50 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
         <button
+          onClick={() => navigate("/notifications")}
+          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
+          aria-label="Notification settings"
+        >
+          <Bell size={18} className="text-foreground sm:size-5" />
+        </button>
+        <button
           onClick={() => navigate("/calendar")}
           className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
           aria-label="Calendar view"
