@@ -269,6 +269,35 @@ export default function Profile() {
               />
             </button>
           </div>
+
+          {/* Language Preference */}
+          <div className="mt-6">
+            <label className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Globe size={14} />
+              Language Preference
+            </label>
+            <p className="mb-3 text-xs text-muted-foreground/70">
+              Sets your preferred language for future i18n support.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {(Object.entries(languages) as [Language, typeof languages[Language]][]).map(
+                ([key, { native, flag }]) => (
+                  <button
+                    key={key}
+                    onClick={() => updateTheme({ language: key })}
+                    className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
+                      theme.language === key
+                        ? "border-primary bg-accent text-accent-foreground shadow-sm"
+                        : "border-input text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                    }`}
+                  >
+                    <span className="text-base">{flag}</span>
+                    {native}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
         </motion.div>
 
         {/* Notification Settings Link */}
