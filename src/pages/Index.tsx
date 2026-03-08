@@ -64,47 +64,53 @@ const Index = () => {
 
   // Load tasks from Supabase
   const fetchTasks = useCallback(async () => {
-    const { data, error } = await supabase
-      .from("tasks")
-      .select("*")
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      toast.error("Failed to load tasks");
-      return;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split("T")[0];
-
-    const mapped: Task[] = (data || []).map((t) => ({
-      id: t.id,
-      title: t.title,
-      date: t.date,
-      time: t.time || null,
-      priority: t.priority as Task["priority"],
-      category: t.category as Category,
-      completed: t.completed,
-    }));
-
-    // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
-    const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
-    if (overdue.length > 0) {
-      for (const task of overdue) {
-        task.date = tomorrowStr;
-      }
-      supabase
+    try {
+      const { data, error } = await supabase
         .from("tasks")
-        .update({ date: tomorrowStr })
-        .in("id", overdue.map((t) => t.id))
-        .then(() => {});
-    }
+        .select("*")
+        .order("created_at", { ascending: true });
 
-    setTasks(mapped);
-    setStreak(refreshStreak());
+      if (error) {
+        console.error("fetchTasks error:", error);
+        toast.error("Failed to load tasks");
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+      const mapped: Task[] = (data || []).map((t) => ({
+        id: t.id,
+        title: t.title,
+        date: t.date || tomorrowStr,
+        time: t.time || null,
+        priority: (t.priority as Task["priority"]) || "Medium",
+        category: (t.category as Category) || "Other",
+        completed: !!t.completed,
+      }));
+
+      // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
+      const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
+      if (overdue.length > 0) {
+        for (const task of overdue) {
+          task.date = tomorrowStr;
+        }
+        supabase
+          .from("tasks")
+          .update({ date: tomorrowStr })
+          .in("id", overdue.map((t) => t.id))
+          .then(() => {});
+      }
+
+      setTasks(mapped);
+      setStreak(refreshStreak());
+    } catch (err) {
+      console.error("fetchTasks unexpected error:", err);
+      toast.error("Something went wrong loading tasks");
+    }
   }, []);
 
   useEffect(() => {
@@ -113,66 +119,90 @@ const Index = () => {
 
   const addTask = async () => {
     if (!title || !date || !user) return;
-    const { error } = await supabase.from("tasks").insert({
-      user_id: user.id,
-      title,
-      date,
-      time: time || null,
-      priority,
-      category,
-    } as any);
-    if (error) {
+    try {
+      const { error } = await supabase.from("tasks").insert({
+        user_id: user.id,
+        title,
+        date,
+        time: time || null,
+        priority,
+        category,
+      } as any);
+      if (error) {
+        console.error("addTask error:", error);
+        toast.error("Failed to add task");
+        return;
+      }
+      setTitle("");
+      setDate("");
+      setTime("");
+      fetchTasks();
+    } catch (err) {
+      console.error("addTask unexpected error:", err);
       toast.error("Failed to add task");
-      return;
     }
-    setTitle("");
-    setDate("");
-    setTime("");
-    fetchTasks();
   };
 
   const completeTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
-    if (error) {
-      toast.error("Failed to complete task");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
+      if (error) {
+        toast.error("Failed to complete task");
+        return;
+      }
+      setStreak(recordCompletion());
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.7 },
+          colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
+        });
+      } catch (_) {}
+      fetchTasks();
+    } catch (err) {
+      console.error("completeTask error:", err);
     }
-    setStreak(recordCompletion());
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.7 },
-      colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
-    });
-    fetchTasks();
   };
 
   const uncompleteTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
-    if (error) {
-      toast.error("Failed to undo completion");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
+      if (error) {
+        toast.error("Failed to undo completion");
+        return;
+      }
+      fetchTasks();
+    } catch (err) {
+      console.error("uncompleteTask error:", err);
     }
-    fetchTasks();
   };
 
   const deleteTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").delete().eq("id", id);
-    if (error) {
-      toast.error("Failed to delete task");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").delete().eq("id", id);
+      if (error) {
+        toast.error("Failed to delete task");
+        return;
+      }
+      fetchTasks();
+    } catch (err) {
+      console.error("deleteTask error:", err);
     }
-    fetchTasks();
   };
 
   const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => {
-    const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
-    if (error) {
-      toast.error("Failed to update task");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
+      if (error) {
+        toast.error("Failed to update task");
+        return;
+      }
+      toast.success("Task updated");
+      fetchTasks();
+    } catch (err) {
+      console.error("editTask error:", err);
     }
-    toast.success("Task updated");
-    fetchTasks();
   };
 
   const reminders = useTaskReminders(tasks);
