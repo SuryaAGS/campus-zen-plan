@@ -339,6 +339,25 @@ const Index = () => {
             </button>
           </div>
 
+          {/* Sort Bar */}
+          <div className="mb-4 flex items-center gap-2">
+            <ArrowUpDown size={14} className="text-primary-foreground/70" />
+            <span className="text-xs text-primary-foreground/70">Sort:</span>
+            {(["date", "priority", "category"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setSortBy(s)}
+                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-all ${
+                  sortBy === s
+                    ? "bg-card text-foreground shadow-card"
+                    : "bg-primary-foreground/10 text-primary-foreground/80 hover:bg-primary-foreground/20"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+
           {/* Reminders */}
           <TaskReminders dueToday={reminders.dueToday} dueTomorrow={reminders.dueTomorrow} />
 
