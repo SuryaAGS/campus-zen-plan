@@ -40,7 +40,7 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${getCategoryColor(task.category).bg} ${getCategoryColor(task.category).text}`}>
               {getCategoryEmoji(task.category)} {task.category}
             </span>
-            <span className="text-muted-foreground">{task.date}</span>
+            <span className="text-muted-foreground">{task.date}{task.time ? ` · ${task.time}` : ""}</span>
           </div>
         </div>
         <div className="flex gap-2">

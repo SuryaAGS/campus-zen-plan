@@ -6,6 +6,7 @@ const makeTask = (date: string, completed = false): Task => ({
   id: crypto.randomUUID(),
   title: "Test task",
   date,
+  time: null,
   priority: "High",
   category: "Assignment",
   completed,
