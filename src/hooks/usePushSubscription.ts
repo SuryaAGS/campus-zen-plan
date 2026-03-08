@@ -57,7 +57,7 @@ export function usePushSubscription() {
       const vapidPublicKey = await getVapidPublicKey();
       
       // Convert base64url to Uint8Array
-      const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+      const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey).buffer as ArrayBuffer;
       
       // Get service worker registration
       const registration = await navigator.serviceWorker.ready;
