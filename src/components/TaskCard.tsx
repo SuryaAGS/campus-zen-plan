@@ -65,6 +65,9 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
               <Undo2 size={16} />
             </button>
           )}
+          {!task.completed && (
+            <EditTaskDialog task={task} allCategories={allCategories} onSave={onEdit} />
+          )}
           <button
             onClick={() => onDelete(task.id)}
             className="rounded-md bg-muted p-2 text-muted-foreground transition-colors hover:bg-destructive hover:text-destructive-foreground"
