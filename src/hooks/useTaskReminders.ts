@@ -20,19 +20,28 @@ function getTasksDueSoon(tasks: Task[]) {
 function getTasksDueSoonByTime(tasks: Task[]) {
   const now = new Date();
   const nowMs = now.getTime();
+  const ONE_MIN = 60 * 1000;
   const FIVE_MIN = 5 * 60 * 1000;
 
-  const dueSoon: Task[] = [];
+  const dueNow: Task[] = [];
+  const dueFiveMin: Task[] = [];
+
   for (const t of tasks) {
     if (t.completed || !t.time || !t.date) continue;
     const taskDateTime = new Date(`${t.date}T${t.time}`);
     if (isNaN(taskDateTime.getTime())) continue;
     const diff = taskDateTime.getTime() - nowMs;
-    if (diff <= FIVE_MIN && diff >= -FIVE_MIN) {
-      dueSoon.push(t);
+
+    // Exact time: within ±1 minute
+    if (diff >= -ONE_MIN && diff <= ONE_MIN) {
+      dueNow.push(t);
+    }
+    // 5 minutes before: between 4 and 6 minutes ahead
+    else if (diff > 4 * ONE_MIN && diff <= 6 * ONE_MIN) {
+      dueFiveMin.push(t);
     }
   }
-  return dueSoon;
+  return { dueNow, dueFiveMin };
 }
 
 function requestNotificationPermission() {
@@ -57,6 +66,7 @@ async function sendBrowserNotification(title: string, body: string) {
 
 const SESSION_KEY = "collegemate-notified-session";
 const TIME_NOTIFIED_KEY = "collegemate-time-notified";
+const TIME_5MIN_NOTIFIED_KEY = "collegemate-time-5min-notified";
 
 function hasNotifiedThisSession(): boolean {
   return sessionStorage.getItem(SESSION_KEY) === "true";
@@ -66,18 +76,18 @@ function markNotifiedThisSession() {
   sessionStorage.setItem(SESSION_KEY, "true");
 }
 
-function getTimeNotifiedIds(): Set<string> {
+function getTimeNotifiedIds(key = TIME_NOTIFIED_KEY): Set<string> {
   try {
-    return new Set(JSON.parse(sessionStorage.getItem(TIME_NOTIFIED_KEY) || "[]"));
+    return new Set(JSON.parse(sessionStorage.getItem(key) || "[]"));
   } catch {
     return new Set();
   }
 }
 
-function markTimeNotified(ids: string[]) {
-  const existing = getTimeNotifiedIds();
+function markTimeNotified(ids: string[], key = TIME_NOTIFIED_KEY) {
+  const existing = getTimeNotifiedIds(key);
   ids.forEach((id) => existing.add(id));
-  sessionStorage.setItem(TIME_NOTIFIED_KEY, JSON.stringify([...existing]));
+  sessionStorage.setItem(key, JSON.stringify([...existing]));
 }
 
 function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string) {
@@ -134,21 +144,27 @@ export function useTaskReminders(tasks: Task[]) {
     const settings = getNotificationSettings();
     if (!settings.enableDueToday) return;
 
-    const dueSoon = getTasksDueSoonByTime(currentTasks);
-    const alreadyNotified = getTimeNotifiedIds();
-    const newDueSoon = dueSoon.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
+    const { dueNow, dueFiveMin } = getTasksDueSoonByTime(currentTasks);
 
-    if (newDueSoon.length === 0) return;
-
-    for (const task of newDueSoon) {
-      const msg = `"${task.title}" is due at ${task.time}!`;
-      if (settings.enableToastReminders) {
-        showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
-      }
-      if (settings.enablePushNotifications) sendBrowserNotification("⏰ Coming Up Soon", msg);
+    // 5-minute warning
+    const already5min = getTimeNotifiedIds(TIME_5MIN_NOTIFIED_KEY);
+    const new5min = dueFiveMin.filter((t) => !already5min.has(t.id) && !isSnoozed(`toast-time-5min-${t.id}`));
+    for (const task of new5min) {
+      const msg = `"${task.title}" starts at ${task.time} — 5 minutes!`;
+      if (settings.enableToastReminders) showSnoozeableToast("info", `⏳ ${msg}`, `toast-time-5min-${task.id}`);
+      if (settings.enablePushNotifications) sendBrowserNotification("⏳ 5 Minutes Left", msg);
     }
+    if (new5min.length > 0) markTimeNotified(new5min.map((t) => t.id), TIME_5MIN_NOTIFIED_KEY);
 
-    markTimeNotified(newDueSoon.map((t) => t.id));
+    // Exact time notification
+    const alreadyNotified = getTimeNotifiedIds(TIME_NOTIFIED_KEY);
+    const newDueNow = dueNow.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
+    for (const task of newDueNow) {
+      const msg = `"${task.title}" is due NOW!`;
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
+      if (settings.enablePushNotifications) sendBrowserNotification("⏰ Task Due Now", msg);
+    }
+    if (newDueNow.length > 0) markTimeNotified(newDueNow.map((t) => t.id), TIME_NOTIFIED_KEY);
   }, []);
 
   useEffect(() => {

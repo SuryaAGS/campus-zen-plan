@@ -62,28 +62,34 @@ Deno.serve(async (req) => {
     }
 
     const nowMs = now.getTime();
+    const ONE_MIN = 60 * 1000;
     const FIVE_MIN = 5 * 60 * 1000;
 
-    // Separate tasks into time-specific (due within 30 min window) and date-only
     const tasksByUser: Record<string, {
       dueToday: typeof tasks;
       dueTomorrow: typeof tasks;
-      dueSoon: typeof tasks;
+      dueNow: typeof tasks;
+      dueFiveMin: typeof tasks;
     }> = {};
 
     for (const task of tasks) {
       if (!tasksByUser[task.user_id]) {
-        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueSoon: [] };
+        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueNow: [], dueFiveMin: [] };
       }
 
-      // Check if task has a specific time and is due soon
       if (task.time && task.date === todayStr) {
         const taskDateTime = new Date(`${task.date}T${task.time}`);
         if (!isNaN(taskDateTime.getTime())) {
           const diff = taskDateTime.getTime() - nowMs;
-          if (diff >= -FIVE_MIN && diff <= FIVE_MIN) {
-            tasksByUser[task.user_id].dueSoon.push(task);
-            continue; // Don't also add to dueToday
+          // Exact time: within ±1 minute
+          if (diff >= -ONE_MIN && diff <= ONE_MIN) {
+            tasksByUser[task.user_id].dueNow.push(task);
+            continue;
+          }
+          // 5 minutes before: between 4 and 6 minutes ahead
+          if (diff > 4 * ONE_MIN && diff <= 6 * ONE_MIN) {
+            tasksByUser[task.user_id].dueFiveMin.push(task);
+            continue;
           }
         }
       }
@@ -120,12 +126,22 @@ Deno.serve(async (req) => {
 
       const notifications: { title: string; body: string }[] = [];
 
-      // Time-specific notifications (highest priority)
-      if (userTasks.dueSoon.length > 0) {
-        for (const task of userTasks.dueSoon) {
+      // 5-minute warning
+      if (userTasks.dueFiveMin.length > 0) {
+        for (const task of userTasks.dueFiveMin) {
           notifications.push({
-            title: "⏰ Coming Up Soon",
-            body: `"${task.title}" is due at ${task.time}!`,
+            title: "⏳ 5 Minutes Left",
+            body: `"${task.title}" starts at ${task.time} — 5 minutes!`,
+          });
+        }
+      }
+
+      // Exact time notifications
+      if (userTasks.dueNow.length > 0) {
+        for (const task of userTasks.dueNow) {
+          notifications.push({
+            title: "⏰ Task Due Now",
+            body: `"${task.title}" is due NOW!`,
           });
         }
       }
