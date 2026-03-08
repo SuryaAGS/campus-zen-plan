@@ -7,7 +7,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import mascot from "@/assets/mascot.png";
-import { Task } from "@/types/task";
+import { Task, Category } from "@/types/task";
 import { refreshStreak, StreakData, getAiSuggestion } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";

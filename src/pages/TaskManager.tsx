@@ -57,7 +57,7 @@ const TaskManager = () => {
         date: t.date || tomorrowStr,
         time: t.time || null,
         priority: (t.priority as Task["priority"]) || "Medium",
-        category: t.category || "Other",
+        category: (t.category as Category) || "Other",
         completed: !!t.completed,
       }));
 

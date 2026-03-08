@@ -306,7 +306,7 @@ const Index = () => {
           <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-8 h-32 w-32 drop-shadow-2xl sm:mb-10 sm:h-44 sm:w-44 md:h-52 md:w-52" />
           <div className="flex flex-col items-center gap-3 sm:flex-row">
             <button
-              onClick={scrollToApp}
+              onClick={() => navigate("/dashboard")}
               className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3 text-base font-semibold text-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card sm:text-lg"
             >
               Start Planning
