@@ -1,10 +1,12 @@
 export type AccentColor = "indigo" | "teal" | "rose" | "amber" | "emerald" | "violet";
 export type FontSize = "small" | "medium" | "large";
+export type Language = "en" | "es" | "fr" | "de" | "pt" | "ja" | "zh" | "ar" | "hi" | "ko";
 
 export interface ThemeSettings {
   accentColor: AccentColor;
   fontSize: FontSize;
   darkMode: boolean;
+  language: Language;
 }
 
 const STORAGE_KEY = "theme-settings";
@@ -13,6 +15,20 @@ const defaults: ThemeSettings = {
   accentColor: "indigo",
   fontSize: "medium",
   darkMode: false,
+  language: "en",
+};
+
+export const languages: Record<Language, { label: string; native: string; flag: string }> = {
+  en: { label: "English", native: "English", flag: "🇺🇸" },
+  es: { label: "Spanish", native: "Español", flag: "🇪🇸" },
+  fr: { label: "French", native: "Français", flag: "🇫🇷" },
+  de: { label: "German", native: "Deutsch", flag: "🇩🇪" },
+  pt: { label: "Portuguese", native: "Português", flag: "🇧🇷" },
+  ja: { label: "Japanese", native: "日本語", flag: "🇯🇵" },
+  zh: { label: "Chinese", native: "中文", flag: "🇨🇳" },
+  ar: { label: "Arabic", native: "العربية", flag: "🇸🇦" },
+  hi: { label: "Hindi", native: "हिन्दी", flag: "🇮🇳" },
+  ko: { label: "Korean", native: "한국어", flag: "🇰🇷" },
 };
 
 export const accentColors: Record<AccentColor, { label: string; hsl: string; preview: string }> = {
