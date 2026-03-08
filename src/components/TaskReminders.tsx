@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle, Clock, X, AlarmClockOff } from "lucide-react";
 import { Task } from "@/types/task";
 import { toast } from "sonner";
+import { getNotificationSettings } from "@/lib/notificationSettings";
 
 interface TaskRemindersProps {
   dueToday: Task[];
@@ -28,18 +29,21 @@ const TaskReminders = ({ dueToday, dueTomorrow }: TaskRemindersProps) => {
   const [dismissedTomorrow, setDismissedTomorrow] = useState(false);
   const [snoozed, setSnoozedState] = useState<Record<string, number>>(getSnoozed);
 
+  const settings = getNotificationSettings();
   const now = Date.now();
   const isActive = (key: string) => !snoozed[key] || snoozed[key] < now;
 
   const snooze = (key: string, label: string) => {
-    const updated = { ...snoozed, [key]: now + 30 * 60 * 1000 }; // 30 min
+    const updated = { ...snoozed, [key]: now + 30 * 60 * 1000 };
     setSnoozed(updated);
     setSnoozedState(updated);
     toast.info(`${label} snoozed for 30 minutes`);
   };
 
-  const showToday = dueToday.length > 0 && !dismissedToday && isActive("today");
-  const showTomorrow = dueTomorrow.length > 0 && !dismissedTomorrow && isActive("tomorrow");
+  if (!settings.enableReminderBanners) return null;
+
+  const showToday = dueToday.length > 0 && !dismissedToday && isActive("today") && settings.enableDueToday;
+  const showTomorrow = dueTomorrow.length > 0 && !dismissedTomorrow && isActive("tomorrow") && settings.enableDueTomorrow;
 
   if (!showToday && !showTomorrow) return null;
 
