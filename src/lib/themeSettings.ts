@@ -1,6 +1,6 @@
 export type AccentColor = "indigo" | "teal" | "rose" | "amber" | "emerald" | "violet";
 export type FontSize = "small" | "medium" | "large";
-export type Language = "en" | "es" | "fr" | "de" | "pt" | "ja" | "zh" | "ar" | "hi" | "ko";
+export type Language = "en" | "es" | "fr" | "de" | "pt" | "ja" | "zh" | "ar" | "hi" | "ko" | "te";
 
 export interface ThemeSettings {
   accentColor: AccentColor;
@@ -29,6 +29,7 @@ export const languages: Record<Language, { label: string; native: string; flag: 
   ar: { label: "Arabic", native: "العربية", flag: "🇸🇦" },
   hi: { label: "Hindi", native: "हिन्दी", flag: "🇮🇳" },
   ko: { label: "Korean", native: "한국어", flag: "🇰🇷" },
+  te: { label: "Telugu", native: "తెలుగు", flag: "🇮🇳" },
 };
 
 export const accentColors: Record<AccentColor, { label: string; hsl: string; preview: string }> = {
