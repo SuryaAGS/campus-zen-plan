@@ -68,6 +68,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Dark Mode Toggle */}
+      <button
+        onClick={() => setDark((d) => !d)}
+        className="fixed right-4 top-4 z-50 rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+        aria-label="Toggle dark mode"
+      >
+        {dark ? <Sun size={20} className="text-foreground" /> : <Moon size={20} className="text-foreground" />}
+      </button>
       {/* Landing Hero */}
       <section className="gradient-bg flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <motion.div
