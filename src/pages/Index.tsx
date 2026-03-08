@@ -284,21 +284,21 @@ const Index = () => {
           </motion.div>
 
           {/* Add Task Form */}
-          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 rounded-xl bg-card p-5 shadow-elevated">
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[180px]">
+          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 rounded-xl bg-card p-4 shadow-elevated sm:p-5">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+              <div className="sm:col-span-2 lg:flex-1 lg:min-w-[180px]">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Task</label>
                 <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Study for midterms" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" onKeyDown={(e) => e.key === "Enter" && addTask()} />
               </div>
-              <div className="min-w-[150px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Due Date</label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
-              <div className="min-w-[110px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Time</label>
                 <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
-              <div className="min-w-[110px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>
                 <select value={priority} onChange={(e) => setPriority(e.target.value as Task["priority"])} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                   <option value="High">🔴 High</option>
@@ -306,7 +306,7 @@ const Index = () => {
                   <option value="Low">🟢 Low</option>
                 </select>
               </div>
-              <div className="min-w-[130px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                   {allCategoryNames.map((c) => (
@@ -314,9 +314,11 @@ const Index = () => {
                   ))}
                 </select>
               </div>
-              <button onClick={addTask} className="gradient-bg flex items-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110">
-                <Plus size={16} /> Add
-              </button>
+              <div className="sm:col-span-2 lg:col-span-1">
+                <button onClick={addTask} className="gradient-bg flex w-full items-center justify-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110 lg:w-auto">
+                  <Plus size={16} /> Add
+                </button>
+              </div>
             </div>
           </motion.div>
 
