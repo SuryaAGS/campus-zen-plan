@@ -24,6 +24,7 @@ const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("High");
   const [category, setCategory] = useState<string>("Assignment");
   const [filterCategory, setFilterCategory] = useState<string>("All");
@@ -83,6 +84,7 @@ const Index = () => {
         id: t.id,
         title: t.title,
         date: t.date,
+        time: (t as any).time || null,
         priority: t.priority as Task["priority"],
         category: t.category as Category,
         completed: t.completed,
@@ -108,15 +110,17 @@ const Index = () => {
       user_id: user.id,
       title,
       date,
+      time: time || null,
       priority,
       category,
-    });
+    } as any);
     if (error) {
       toast.error("Failed to add task");
       return;
     }
     setTitle("");
     setDate("");
+    setTime("");
     fetchTasks();
   };
 
@@ -251,6 +255,10 @@ const Index = () => {
               <div className="min-w-[150px]">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Due Date</label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+              </div>
+              <div className="min-w-[110px]">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Time</label>
+                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
               <div className="min-w-[110px]">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>
