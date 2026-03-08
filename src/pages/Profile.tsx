@@ -1,10 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Camera, Save, User, Bell } from "lucide-react";
+import { ArrowLeft, Camera, Save, User, Bell, Palette, Sun, Moon, Type } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import {
+  getThemeSettings,
+  saveThemeSettings,
+  accentColors,
+  type AccentColor,
+  type FontSize,
+} from "@/lib/themeSettings";
+
+const fontSizeOptions: { value: FontSize; label: string }[] = [
+  { value: "small", label: "Small" },
+  { value: "medium", label: "Medium" },
+  { value: "large", label: "Large" },
+];
 
 export default function Profile() {
   const { user } = useAuth();
@@ -15,6 +28,8 @@ export default function Profile() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const [theme, setTheme] = useState(getThemeSettings);
 
   useEffect(() => {
     if (!user) return;
@@ -28,13 +43,18 @@ export default function Profile() {
           setDisplayName(data.display_name || "");
           setAvatarUrl(data.avatar_url);
         } else {
-          // Fall back to auth user metadata (e.g. Google OAuth)
           const meta = user.user_metadata;
           setDisplayName(meta?.full_name || meta?.display_name || meta?.name || "");
           setAvatarUrl(meta?.avatar_url || meta?.picture || null);
         }
       });
   }, [user]);
+
+  const updateTheme = (patch: Partial<typeof theme>) => {
+    const next = { ...theme, ...patch };
+    setTheme(next);
+    saveThemeSettings(next);
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,10 +179,106 @@ export default function Profile() {
             <Save size={16} />
             {loading ? "Saving..." : "Save Changes"}
           </button>
+        </motion.div>
 
+        {/* Theme Customization */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mt-6 rounded-xl bg-card p-8 shadow-elevated"
+        >
+          <h2 className="mb-5 flex items-center gap-2 font-display text-lg font-bold text-card-foreground">
+            <Palette size={20} className="text-primary" />
+            Theme Customization
+          </h2>
+
+          {/* Accent Color */}
+          <div className="mb-6">
+            <label className="mb-2 block text-xs font-medium text-muted-foreground">Accent Color</label>
+            <div className="grid grid-cols-3 gap-2">
+              {(Object.entries(accentColors) as [AccentColor, typeof accentColors[AccentColor]][]).map(
+                ([key, { label, preview }]) => (
+                  <button
+                    key={key}
+                    onClick={() => updateTheme({ accentColor: key })}
+                    className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
+                      theme.accentColor === key
+                        ? "border-primary bg-accent text-accent-foreground shadow-sm"
+                        : "border-input text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                    }`}
+                  >
+                    <span
+                      className="h-4 w-4 shrink-0 rounded-full"
+                      style={{ backgroundColor: preview }}
+                    />
+                    {label}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Font Size */}
+          <div className="mb-6">
+            <label className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Type size={14} />
+              Font Size
+            </label>
+            <div className="flex gap-2">
+              {fontSizeOptions.map(({ value, label }) => (
+                <button
+                  key={value}
+                  onClick={() => updateTheme({ fontSize: value })}
+                  className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
+                    theme.fontSize === value
+                      ? "border-primary bg-accent text-accent-foreground shadow-sm"
+                      : "border-input text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Dark Mode Toggle */}
+          <div className="flex items-center justify-between rounded-lg border border-input px-4 py-3">
+            <div className="flex items-center gap-2">
+              {theme.darkMode ? (
+                <Moon size={16} className="text-primary" />
+              ) : (
+                <Sun size={16} className="text-primary" />
+              )}
+              <span className="text-sm font-medium text-card-foreground">
+                {theme.darkMode ? "Dark Mode" : "Light Mode"}
+              </span>
+            </div>
+            <button
+              onClick={() => updateTheme({ darkMode: !theme.darkMode })}
+              className={`relative h-6 w-11 rounded-full transition-colors ${
+                theme.darkMode ? "bg-primary" : "bg-muted"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-card shadow transition-transform ${
+                  theme.darkMode ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Notification Settings Link */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-6"
+        >
           <button
             onClick={() => navigate("/notifications")}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-input py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-input bg-card py-3.5 text-sm font-medium text-muted-foreground shadow-card transition-colors hover:bg-muted hover:text-foreground"
           >
             <Bell size={16} />
             Notification Settings
