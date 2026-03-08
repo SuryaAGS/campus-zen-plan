@@ -20,7 +20,7 @@ function getTasksDueSoon(tasks: Task[]) {
 function getTasksDueSoonByTime(tasks: Task[]) {
   const now = new Date();
   const nowMs = now.getTime();
-  const FIFTEEN_MIN = 15 * 60 * 1000;
+  const FIVE_MIN = 5 * 60 * 1000;
 
   const dueSoon: Task[] = [];
   for (const t of tasks) {
