@@ -9,8 +9,10 @@ import {
   getThemeSettings,
   saveThemeSettings,
   accentColors,
+  languages,
   type AccentColor,
   type FontSize,
+  type Language,
 } from "@/lib/themeSettings";
 
 const fontSizeOptions: { value: FontSize; label: string }[] = [
