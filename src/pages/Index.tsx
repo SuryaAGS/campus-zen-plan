@@ -144,6 +144,7 @@ const Index = () => {
     fetchTasks();
   };
 
+  const reminders = useTaskReminders(tasks);
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
   const pending = filtered.filter((t) => !t.completed);
   const completed = filtered.filter((t) => t.completed);
