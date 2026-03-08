@@ -39,16 +39,16 @@ Deno.serve(async (req) => {
     const vapidPrivateKey = JSON.parse(vapidPrivateData.value);
 
     // Get today and tomorrow dates
-    const today = new Date();
-    const todayStr = today.toISOString().split("T")[0];
-    const tomorrow = new Date(today);
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0];
+    const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
     // Get all incomplete tasks due today or tomorrow
     const { data: tasks, error: tasksError } = await supabase
       .from("tasks")
-      .select("id, user_id, title, date, priority")
+      .select("id, user_id, title, date, time, priority")
       .eq("completed", false)
       .in("date", [todayStr, tomorrowStr]);
 
@@ -61,12 +61,34 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Group tasks by user
-    const tasksByUser: Record<string, { dueToday: typeof tasks; dueTomorrow: typeof tasks }> = {};
+    const nowMs = now.getTime();
+    const FIFTEEN_MIN = 15 * 60 * 1000;
+    const THIRTY_MIN = 30 * 60 * 1000;
+
+    // Separate tasks into time-specific (due within 30 min window) and date-only
+    const tasksByUser: Record<string, {
+      dueToday: typeof tasks;
+      dueTomorrow: typeof tasks;
+      dueSoon: typeof tasks;
+    }> = {};
+
     for (const task of tasks) {
       if (!tasksByUser[task.user_id]) {
-        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [] };
+        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueSoon: [] };
       }
+
+      // Check if task has a specific time and is due soon
+      if (task.time && task.date === todayStr) {
+        const taskDateTime = new Date(`${task.date}T${task.time}`);
+        if (!isNaN(taskDateTime.getTime())) {
+          const diff = taskDateTime.getTime() - nowMs;
+          if (diff >= -60_000 && diff <= THIRTY_MIN) {
+            tasksByUser[task.user_id].dueSoon.push(task);
+            continue; // Don't also add to dueToday
+          }
+        }
+      }
+
       if (task.date === todayStr) {
         tasksByUser[task.user_id].dueToday.push(task);
       } else {
@@ -93,44 +115,58 @@ Deno.serve(async (req) => {
     let sentCount = 0;
     const errors: string[] = [];
 
-    // Send notifications
     for (const sub of subscriptions) {
       const userTasks = tasksByUser[sub.user_id];
       if (!userTasks) continue;
 
-      let title = "";
-      let body = "";
+      const notifications: { title: string; body: string }[] = [];
 
-      if (userTasks.dueToday.length > 0) {
-        title = "⚠️ Tasks Due Today";
-        body = userTasks.dueToday.length === 1
-          ? `"${userTasks.dueToday[0].title}" is due today!`
-          : `${userTasks.dueToday.length} tasks are due today!`;
-      } else if (userTasks.dueTomorrow.length > 0) {
-        title = "📅 Tasks Due Tomorrow";
-        body = userTasks.dueTomorrow.length === 1
-          ? `"${userTasks.dueTomorrow[0].title}" is due tomorrow`
-          : `${userTasks.dueTomorrow.length} tasks are due tomorrow`;
+      // Time-specific notifications (highest priority)
+      if (userTasks.dueSoon.length > 0) {
+        for (const task of userTasks.dueSoon) {
+          notifications.push({
+            title: "⏰ Coming Up Soon",
+            body: `"${task.title}" is due at ${task.time}!`,
+          });
+        }
       }
 
-      if (!title) continue;
+      // Date-based notifications
+      if (userTasks.dueToday.length > 0) {
+        notifications.push({
+          title: "⚠️ Tasks Due Today",
+          body: userTasks.dueToday.length === 1
+            ? `"${userTasks.dueToday[0].title}" is due today!`
+            : `${userTasks.dueToday.length} tasks are due today!`,
+        });
+      }
 
-      try {
-        await sendPushNotification(
-          sub,
-          { title, body, icon: "/pwa-192x192.png" },
-          vapidPublicKey,
-          vapidPrivateKey,
-          supabaseUrl
-        );
-        sentCount++;
-      } catch (err) {
-        console.error(`Failed to send to ${sub.endpoint}:`, err);
-        errors.push(sub.endpoint);
-        
-        // Remove invalid subscriptions (410 Gone)
-        if (err.message?.includes("410") || err.message?.includes("expired")) {
-          await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+      if (userTasks.dueTomorrow.length > 0) {
+        notifications.push({
+          title: "📅 Tasks Due Tomorrow",
+          body: userTasks.dueTomorrow.length === 1
+            ? `"${userTasks.dueTomorrow[0].title}" is due tomorrow`
+            : `${userTasks.dueTomorrow.length} tasks are due tomorrow`,
+        });
+      }
+
+      for (const notif of notifications) {
+        try {
+          await sendPushNotification(
+            sub,
+            { ...notif, icon: "/pwa-192x192.png" },
+            vapidPublicKey,
+            vapidPrivateKey,
+            supabaseUrl
+          );
+          sentCount++;
+        } catch (err) {
+          console.error(`Failed to send to ${sub.endpoint}:`, err);
+          errors.push(sub.endpoint);
+
+          if (err.message?.includes("410") || err.message?.includes("expired")) {
+            await supabase.from("push_subscriptions").delete().eq("id", sub.id);
+          }
         }
       }
     }

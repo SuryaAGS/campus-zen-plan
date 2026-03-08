@@ -116,6 +116,29 @@ export function useTaskReminders(tasks: Task[]) {
     }
   }, []);
 
+  // Time-specific reminder check (runs every minute)
+  const checkTimeReminders = useCallback(() => {
+    const currentTasks = tasksRef.current;
+    if (currentTasks.length === 0) return;
+
+    const settings = getNotificationSettings();
+    if (!settings.enableDueToday) return;
+
+    const dueSoon = getTasksDueSoonByTime(currentTasks);
+    const alreadyNotified = getTimeNotifiedIds();
+    const newDueSoon = dueSoon.filter((t) => !alreadyNotified.has(t.id));
+
+    if (newDueSoon.length === 0) return;
+
+    for (const task of newDueSoon) {
+      const msg = `"${task.title}" is due at ${task.time}!`;
+      if (settings.enableToastReminders) toast.warning(`⏰ ${msg}`, { duration: 10000 });
+      if (settings.enablePushNotifications) sendBrowserNotification("⏰ Coming Up Soon", msg);
+    }
+
+    markTimeNotified(newDueSoon.map((t) => t.id));
+  }, []);
+
   useEffect(() => {
     const settings = getNotificationSettings();
     if (settings.enablePushNotifications) requestNotificationPermission();
@@ -127,6 +150,14 @@ export function useTaskReminders(tasks: Task[]) {
       checkReminders();
     }
   }, [tasks.length > 0, checkReminders]);
+
+  // Check time-specific reminders every minute
+  useEffect(() => {
+    if (tasks.length === 0) return;
+    checkTimeReminders(); // check immediately
+    const interval = setInterval(checkTimeReminders, 60_000);
+    return () => clearInterval(interval);
+  }, [tasks.length > 0, checkTimeReminders]);
 
   useEffect(() => {
     const settings = getNotificationSettings();
