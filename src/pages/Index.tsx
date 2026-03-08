@@ -95,6 +95,8 @@ const Index = () => {
       // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
       const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
       if (overdue.length > 0) {
+        const taskNames = overdue.slice(0, 3).map((t) => `"${t.title}"`).join(", ");
+        const extra = overdue.length > 3 ? ` and ${overdue.length - 3} more` : "";
         for (const task of overdue) {
           task.date = tomorrowStr;
         }
@@ -103,6 +105,10 @@ const Index = () => {
           .update({ date: tomorrowStr })
           .in("id", overdue.map((t) => t.id))
           .then(() => {});
+        toast.info(`🔄 ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""} rescheduled to tomorrow`, {
+          description: `${taskNames}${extra}`,
+          duration: 6000,
+        });
       }
 
       setTasks(mapped);
