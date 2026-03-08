@@ -64,47 +64,53 @@ const Index = () => {
 
   // Load tasks from Supabase
   const fetchTasks = useCallback(async () => {
-    const { data, error } = await supabase
-      .from("tasks")
-      .select("*")
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      toast.error("Failed to load tasks");
-      return;
-    }
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split("T")[0];
-
-    const mapped: Task[] = (data || []).map((t) => ({
-      id: t.id,
-      title: t.title,
-      date: t.date,
-      time: t.time || null,
-      priority: t.priority as Task["priority"],
-      category: t.category as Category,
-      completed: t.completed,
-    }));
-
-    // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
-    const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
-    if (overdue.length > 0) {
-      for (const task of overdue) {
-        task.date = tomorrowStr;
-      }
-      supabase
+    try {
+      const { data, error } = await supabase
         .from("tasks")
-        .update({ date: tomorrowStr })
-        .in("id", overdue.map((t) => t.id))
-        .then(() => {});
-    }
+        .select("*")
+        .order("created_at", { ascending: true });
 
-    setTasks(mapped);
-    setStreak(refreshStreak());
+      if (error) {
+        console.error("fetchTasks error:", error);
+        toast.error("Failed to load tasks");
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+      const mapped: Task[] = (data || []).map((t) => ({
+        id: t.id,
+        title: t.title,
+        date: t.date || tomorrowStr,
+        time: t.time || null,
+        priority: (t.priority as Task["priority"]) || "Medium",
+        category: (t.category as Category) || "Other",
+        completed: !!t.completed,
+      }));
+
+      // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
+      const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
+      if (overdue.length > 0) {
+        for (const task of overdue) {
+          task.date = tomorrowStr;
+        }
+        supabase
+          .from("tasks")
+          .update({ date: tomorrowStr })
+          .in("id", overdue.map((t) => t.id))
+          .then(() => {});
+      }
+
+      setTasks(mapped);
+      setStreak(refreshStreak());
+    } catch (err) {
+      console.error("fetchTasks unexpected error:", err);
+      toast.error("Something went wrong loading tasks");
+    }
   }, []);
 
   useEffect(() => {
