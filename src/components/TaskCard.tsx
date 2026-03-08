@@ -36,8 +36,8 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
             <span className={`font-medium ${priorityStyles[task.priority].split(" ")[1]}`}>
               {task.priority}
             </span>
-            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${categoryColors[task.category] || categoryColors.Other}`}>
-              {categoryEmojis[task.category] || "📌"} {task.category}
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${getCategoryColor(task.category).bg} ${getCategoryColor(task.category).text}`}>
+              {getCategoryEmoji(task.category)} {task.category}
             </span>
             <span className="text-muted-foreground">{task.date}</span>
           </div>
