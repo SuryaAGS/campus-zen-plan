@@ -211,27 +211,27 @@ const Index = () => {
       </button>
 
       {/* Controls - Right */}
-      <div className="fixed right-4 top-4 z-50 flex items-center gap-2">
+      <div className="fixed right-2 top-2 z-50 flex items-center gap-1.5 sm:right-4 sm:top-4 sm:gap-2">
         <button
           onClick={() => navigate("/calendar")}
-          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
           aria-label="Calendar view"
         >
-          <CalendarDays size={20} className="text-foreground" />
+          <CalendarDays size={18} className="text-foreground sm:size-5" />
         </button>
         <button
           onClick={() => setDark((d) => !d)}
-          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
           aria-label="Toggle dark mode"
         >
-          {dark ? <Sun size={20} className="text-foreground" /> : <Moon size={20} className="text-foreground" />}
+          {dark ? <Sun size={18} className="text-foreground sm:size-5" /> : <Moon size={18} className="text-foreground sm:size-5" />}
         </button>
         <button
           onClick={signOut}
-          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
           aria-label="Sign out"
         >
-          <LogOut size={20} className="text-foreground" />
+          <LogOut size={18} className="text-foreground sm:size-5" />
         </button>
       </div>
 
@@ -243,30 +243,32 @@ const Index = () => {
           transition={{ duration: 0.6 }}
           className="max-w-2xl"
         >
-          <div className="mb-6 flex items-center justify-center gap-3">
-            <GraduationCap size={48} className="text-primary-foreground" />
-            <h1 className="font-display text-5xl font-bold text-primary-foreground md:text-6xl">
+          <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <GraduationCap size={36} className="text-primary-foreground sm:size-12" />
+            <h1 className="font-display text-3xl font-bold text-primary-foreground sm:text-5xl md:text-6xl">
               CollegeMate AI Planner
             </h1>
           </div>
-          <p className="mx-auto mb-8 max-w-lg text-lg text-primary-foreground/80 md:text-xl">
+          <p className="mx-auto mb-6 max-w-lg text-base text-primary-foreground/80 sm:mb-8 md:text-xl">
             The smart AI-powered planner that automatically organizes your tasks,
             reschedules missed work, and boosts your productivity.
           </p>
-          <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-10 h-44 w-44 drop-shadow-2xl md:h-52 md:w-52" />
-          <button
-            onClick={scrollToApp}
-            className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3 text-lg font-semibold text-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card"
-          >
-            Start Planning
-            <ArrowDown size={20} />
-          </button>
-          <button
-            onClick={() => navigate("/install")}
-            className="ml-3 inline-flex items-center gap-2 rounded-full bg-primary-foreground/20 px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-105 hover:bg-primary-foreground/30"
-          >
-            <Download size={16} /> Install App
-          </button>
+          <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-8 h-32 w-32 drop-shadow-2xl sm:mb-10 sm:h-44 sm:w-44 md:h-52 md:w-52" />
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <button
+              onClick={scrollToApp}
+              className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3 text-base font-semibold text-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card sm:text-lg"
+            >
+              Start Planning
+              <ArrowDown size={20} />
+            </button>
+            <button
+              onClick={() => navigate("/install")}
+              className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/20 px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-105 hover:bg-primary-foreground/30"
+            >
+              <Download size={16} /> Install App
+            </button>
+          </div>
         </motion.div>
       </section>
 
@@ -282,21 +284,21 @@ const Index = () => {
           </motion.div>
 
           {/* Add Task Form */}
-          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 rounded-xl bg-card p-5 shadow-elevated">
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[180px]">
+          <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 rounded-xl bg-card p-4 shadow-elevated sm:p-5">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+              <div className="sm:col-span-2 lg:flex-1 lg:min-w-[180px]">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Task</label>
                 <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Study for midterms" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" onKeyDown={(e) => e.key === "Enter" && addTask()} />
               </div>
-              <div className="min-w-[150px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Due Date</label>
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
-              <div className="min-w-[110px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Time</label>
                 <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
               </div>
-              <div className="min-w-[110px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>
                 <select value={priority} onChange={(e) => setPriority(e.target.value as Task["priority"])} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                   <option value="High">🔴 High</option>
@@ -304,7 +306,7 @@ const Index = () => {
                   <option value="Low">🟢 Low</option>
                 </select>
               </div>
-              <div className="min-w-[130px]">
+              <div>
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
                 <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
                   {allCategoryNames.map((c) => (
@@ -312,9 +314,11 @@ const Index = () => {
                   ))}
                 </select>
               </div>
-              <button onClick={addTask} className="gradient-bg flex items-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110">
-                <Plus size={16} /> Add
-              </button>
+              <div className="sm:col-span-2 lg:col-span-1">
+                <button onClick={addTask} className="gradient-bg flex w-full items-center justify-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110 lg:w-auto">
+                  <Plus size={16} /> Add
+                </button>
+              </div>
             </div>
           </motion.div>
 
