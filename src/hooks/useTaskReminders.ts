@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { Task } from "@/types/task";
 import { toast } from "sonner";
 import { getNotificationSettings } from "@/lib/notificationSettings";
+import { snoozeReminder, isSnoozed } from "@/lib/snoozeManager";
 
 function getTasksDueSoon(tasks: Task[]) {
   const now = new Date();
@@ -27,7 +28,6 @@ function getTasksDueSoonByTime(tasks: Task[]) {
     const taskDateTime = new Date(`${t.date}T${t.time}`);
     if (isNaN(taskDateTime.getTime())) continue;
     const diff = taskDateTime.getTime() - nowMs;
-    // Notify if task is within 15 min from now (and not more than 1 min past)
     if (diff <= FIFTEEN_MIN && diff >= -60_000) {
       dueSoon.push(t);
     }
@@ -51,7 +51,7 @@ async function sendBrowserNotification(title: string, body: string) {
       new Notification(title, { body, icon: "/favicon.ico" });
     }
   } catch {
-    // Silently fail — toast notifications still work as fallback
+    // Silently fail
   }
 }
 
@@ -80,11 +80,22 @@ function markTimeNotified(ids: string[]) {
   sessionStorage.setItem(TIME_NOTIFIED_KEY, JSON.stringify([...existing]));
 }
 
+function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string) {
+  toast[type](message, {
+    duration: 10000,
+    action: {
+      label: "Snooze 15m",
+      onClick: () => {
+        snoozeReminder(snoozeKey, 15);
+        toast.info(`Snoozed for 15 minutes`);
+      },
+    },
+  });
+}
+
 export function useTaskReminders(tasks: Task[]) {
   const hasNotified = useRef(hasNotifiedThisSession());
   const tasksRef = useRef<Task[]>([]);
-  
-  // Keep tasks ref in sync without triggering effects
   tasksRef.current = tasks;
 
   const checkReminders = useCallback(() => {
@@ -94,19 +105,19 @@ export function useTaskReminders(tasks: Task[]) {
     const settings = getNotificationSettings();
     const { dueToday, dueTomorrow } = getTasksDueSoon(currentTasks);
 
-    if (dueToday.length > 0 && settings.enableDueToday) {
+    if (dueToday.length > 0 && settings.enableDueToday && !isSnoozed("toast-due-today")) {
       const msg = dueToday.length === 1
         ? `"${dueToday[0].title}" is due today!`
         : `${dueToday.length} tasks are due today!`;
-      if (settings.enableToastReminders) toast.warning(msg, { duration: 8000 });
+      if (settings.enableToastReminders) showSnoozeableToast("warning", msg, "toast-due-today");
       if (settings.enablePushNotifications) sendBrowserNotification("⚠️ Due Today", msg);
     }
 
-    if (dueTomorrow.length > 0 && settings.enableDueTomorrow) {
+    if (dueTomorrow.length > 0 && settings.enableDueTomorrow && !isSnoozed("toast-due-tomorrow")) {
       const msg = dueTomorrow.length === 1
         ? `"${dueTomorrow[0].title}" is due tomorrow`
         : `${dueTomorrow.length} tasks are due tomorrow`;
-      if (settings.enableToastReminders) toast.info(msg, { duration: 6000 });
+      if (settings.enableToastReminders) showSnoozeableToast("info", msg, "toast-due-tomorrow");
       if (settings.enablePushNotifications) sendBrowserNotification("📅 Due Tomorrow", msg);
     }
 
@@ -116,7 +127,6 @@ export function useTaskReminders(tasks: Task[]) {
     }
   }, []);
 
-  // Time-specific reminder check (runs every minute)
   const checkTimeReminders = useCallback(() => {
     const currentTasks = tasksRef.current;
     if (currentTasks.length === 0) return;
@@ -126,13 +136,15 @@ export function useTaskReminders(tasks: Task[]) {
 
     const dueSoon = getTasksDueSoonByTime(currentTasks);
     const alreadyNotified = getTimeNotifiedIds();
-    const newDueSoon = dueSoon.filter((t) => !alreadyNotified.has(t.id));
+    const newDueSoon = dueSoon.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
 
     if (newDueSoon.length === 0) return;
 
     for (const task of newDueSoon) {
       const msg = `"${task.title}" is due at ${task.time}!`;
-      if (settings.enableToastReminders) toast.warning(`⏰ ${msg}`, { duration: 10000 });
+      if (settings.enableToastReminders) {
+        showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
+      }
       if (settings.enablePushNotifications) sendBrowserNotification("⏰ Coming Up Soon", msg);
     }
 
@@ -144,17 +156,15 @@ export function useTaskReminders(tasks: Task[]) {
     if (settings.enablePushNotifications) requestNotificationPermission();
   }, []);
 
-  // Only run once when tasks first load
   useEffect(() => {
     if (tasks.length > 0 && !hasNotified.current) {
       checkReminders();
     }
   }, [tasks.length > 0, checkReminders]);
 
-  // Check time-specific reminders every minute
   useEffect(() => {
     if (tasks.length === 0) return;
-    checkTimeReminders(); // check immediately
+    checkTimeReminders();
     const interval = setInterval(checkTimeReminders, 60_000);
     return () => clearInterval(interval);
   }, [tasks.length > 0, checkTimeReminders]);
