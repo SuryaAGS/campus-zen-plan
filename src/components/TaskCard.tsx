@@ -3,13 +3,16 @@ import { motion } from "framer-motion";
 import { Check, Trash2, Undo2 } from "lucide-react";
 import { Task } from "@/types/task";
 import { getCategoryColor, getCategoryEmoji } from "@/lib/categoryColors";
+import EditTaskDialog from "@/components/EditTaskDialog";
 
 interface TaskCardProps {
   task: Task;
   index: number;
   onComplete: (id: string) => void;
   onUncomplete?: (id: string) => void;
+  onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => void;
   onDelete: (id: string) => void;
+  allCategories: string[];
 }
 
 const priorityStyles = {
@@ -19,7 +22,7 @@ const priorityStyles = {
 };
 
 const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
-  function TaskCard({ task, index, onComplete, onUncomplete, onDelete }, ref) {
+  function TaskCard({ task, index, onComplete, onUncomplete, onEdit, onDelete, allCategories }, ref) {
     return (
       <motion.div
         ref={ref}
@@ -61,6 +64,9 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
             >
               <Undo2 size={16} />
             </button>
+          )}
+          {!task.completed && (
+            <EditTaskDialog task={task} allCategories={allCategories} onSave={onEdit} />
           )}
           <button
             onClick={() => onDelete(task.id)}

@@ -158,6 +158,16 @@ const Index = () => {
     fetchTasks();
   };
 
+  const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => {
+    const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
+    if (error) {
+      toast.error("Failed to update task");
+      return;
+    }
+    toast.success("Task updated");
+    fetchTasks();
+  };
+
   const reminders = useTaskReminders(tasks);
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
   const pending = filtered.filter((t) => !t.completed);
@@ -320,7 +330,7 @@ const Index = () => {
             <AnimatePresence>
               {pending.length === 0 && <p className="text-sm text-primary-foreground/60">No pending tasks. Add one above!</p>}
               {pending.map((task, i) => (
-                <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
+                <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onEdit={editTask} onDelete={deleteTask} allCategories={allCategoryNames} />
               ))}
             </AnimatePresence>
           </div>
@@ -331,7 +341,7 @@ const Index = () => {
               <h2 className="font-display text-lg font-semibold text-primary-foreground">✅ Completed ({completed.length})</h2>
               <AnimatePresence>
                 {completed.map((task, i) => (
-                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onUncomplete={uncompleteTask} onDelete={deleteTask} />
+                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onUncomplete={uncompleteTask} onEdit={editTask} onDelete={deleteTask} allCategories={allCategoryNames} />
                 ))}
               </AnimatePresence>
             </div>
