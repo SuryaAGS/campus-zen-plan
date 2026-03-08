@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { 
   GraduationCap, Moon, Sun, LogOut, UserCircle, CalendarDays, 
-  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus
+  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
+  const [rescheduledTasks, setRescheduledTasks] = useState<Array<{ id: string; title: string; date: string; time: string | null; missedCount: number }>>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -58,7 +59,7 @@ const Dashboard = () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-    const mapped: Task[] = (data || []).map((t) => ({
+    const mapped = (data || []).map((t) => ({
       id: t.id,
       title: t.title,
       date: t.date || tomorrowStr,
@@ -66,14 +67,19 @@ const Dashboard = () => {
       priority: (t.priority as Task["priority"]) || "Medium",
       category: (t.category as Category) || "Other",
       completed: !!t.completed,
+      missedCount: (t as any).missed_count ?? 0,
     }));
-    setTasks(mapped);
+
+    setRescheduledTasks(mapped.filter((t) => !t.completed && t.missedCount > 0));
+    const taskState: Task[] = mapped.map(({ missedCount, ...rest }) => rest);
+    setTasks(taskState);
     setStreak(refreshStreak());
   }, []);
 
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
 
   const pending = tasks.filter((t) => !t.completed);
   const completed = tasks.filter((t) => t.completed);
@@ -269,7 +275,46 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* CTA Button */}
+        {/* AI Rescheduled Tasks */}
+        {rescheduledTasks.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="mb-8"
+          >
+            <Card className="border-none shadow-elevated">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <RefreshCw className="h-5 w-5 text-primary" />
+                  AI Rescheduled Tasks
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-sm text-primary">{rescheduledTasks.length}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {rescheduledTasks.map((t) => (
+                  <div
+                    key={t.id}
+                    className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{t.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Moved to {t.date}{t.time ? ` at ${t.time}` : ""} · Rescheduled {t.missedCount}×
+                      </p>
+                    </div>
+                    <span className="ml-3 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      <RefreshCw size={12} />
+                      {t.missedCount}×
+                    </span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
