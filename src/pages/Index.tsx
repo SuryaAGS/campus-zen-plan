@@ -13,6 +13,8 @@ import TaskCard from "@/components/TaskCard";
 import ProgressBar from "@/components/ProgressBar";
 import AiSuggestion from "@/components/AiSuggestion";
 import StreakBadge from "@/components/StreakBadge";
+import TaskReminders from "@/components/TaskReminders";
+import { useTaskReminders } from "@/hooks/useTaskReminders";
 import { toast } from "sonner";
 
 const Index = () => {
@@ -142,6 +144,7 @@ const Index = () => {
     fetchTasks();
   };
 
+  const reminders = useTaskReminders(tasks);
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
   const pending = filtered.filter((t) => !t.completed);
   const completed = filtered.filter((t) => t.completed);
@@ -285,6 +288,9 @@ const Index = () => {
               <Settings size={14} />
             </button>
           </div>
+
+          {/* Reminders */}
+          <TaskReminders dueToday={reminders.dueToday} dueTomorrow={reminders.dueTomorrow} />
 
           {/* Tasks */}
           <div className="mb-6 space-y-3">
