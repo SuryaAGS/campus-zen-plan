@@ -28,7 +28,7 @@ function getTasksDueSoonByTime(tasks: Task[]) {
     const taskDateTime = new Date(`${t.date}T${t.time}`);
     if (isNaN(taskDateTime.getTime())) continue;
     const diff = taskDateTime.getTime() - nowMs;
-    if (diff <= FIFTEEN_MIN && diff >= -60_000) {
+    if (diff <= FIVE_MIN && diff >= -FIVE_MIN) {
       dueSoon.push(t);
     }
   }

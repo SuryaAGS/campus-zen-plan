@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         const taskDateTime = new Date(`${task.date}T${task.time}`);
         if (!isNaN(taskDateTime.getTime())) {
           const diff = taskDateTime.getTime() - nowMs;
-          if (diff >= -60_000 && diff <= THIRTY_MIN) {
+          if (diff >= -FIVE_MIN && diff <= FIVE_MIN) {
             tasksByUser[task.user_id].dueSoon.push(task);
             continue; // Don't also add to dueToday
           }
