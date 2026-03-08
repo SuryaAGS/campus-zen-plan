@@ -72,6 +72,7 @@ const Dashboard = () => {
       missedCount: (t as any).missed_count ?? 0,
     }));
 
+    setRawTasks((data || []).map((t) => ({ date: t.date || tomorrowStr, completed: !!t.completed })));
     setRescheduledTasks(mapped.filter((t) => !t.completed && t.missedCount > 0));
     const taskState: Task[] = mapped.map(({ missedCount, ...rest }) => rest);
     setTasks(taskState);
