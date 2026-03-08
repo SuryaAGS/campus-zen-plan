@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
+import TaskManager from "./pages/TaskManager";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Categories from "./pages/Categories";
@@ -41,6 +43,8 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/tasks" element={<ProtectedRoute><TaskManager /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
               <Route path="/calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
