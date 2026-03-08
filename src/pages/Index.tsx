@@ -131,6 +131,13 @@ const Index = () => {
       {/* Top Controls */}
       <div className="fixed right-4 top-4 z-50 flex gap-2">
         <button
+          onClick={() => navigate("/profile")}
+          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          aria-label="Profile"
+        >
+          <UserCircle size={20} className="text-foreground" />
+        </button>
+        <button
           onClick={() => setDark((d) => !d)}
           className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
           aria-label="Toggle dark mode"
