@@ -20,6 +20,7 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [rawTasks, setRawTasks] = useState<Array<{ date: string; completed: boolean }>>([]);
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
