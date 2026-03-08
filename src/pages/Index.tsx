@@ -17,7 +17,13 @@ const Index = () => {
   const [category, setCategory] = useState<Category>("Assignment");
   const [filterCategory, setFilterCategory] = useState<Category | "All">("All");
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
+  const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const appRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("collegemate-dark", String(dark));
+  }, [dark]);
 
   useEffect(() => {
     const loaded = autoReschedule(loadTasks());
