@@ -120,6 +120,7 @@ const Index = () => {
     }
     setTitle("");
     setDate("");
+    setTime("");
     fetchTasks();
   };
 
