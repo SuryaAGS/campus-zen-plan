@@ -22,11 +22,16 @@ export default function Profile() {
       .from("profiles")
       .select("display_name, avatar_url")
       .eq("user_id", user.id)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
         if (data) {
           setDisplayName(data.display_name || "");
           setAvatarUrl(data.avatar_url);
+        } else {
+          // Fall back to auth user metadata (e.g. Google OAuth)
+          const meta = user.user_metadata;
+          setDisplayName(meta?.full_name || meta?.display_name || meta?.name || "");
+          setAvatarUrl(meta?.avatar_url || meta?.picture || null);
         }
       });
   }, [user]);
