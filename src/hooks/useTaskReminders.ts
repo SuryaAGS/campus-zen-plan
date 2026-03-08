@@ -16,6 +16,25 @@ function getTasksDueSoon(tasks: Task[]) {
   return { dueToday, dueTomorrow };
 }
 
+function getTasksDueSoonByTime(tasks: Task[]) {
+  const now = new Date();
+  const nowMs = now.getTime();
+  const FIFTEEN_MIN = 15 * 60 * 1000;
+
+  const dueSoon: Task[] = [];
+  for (const t of tasks) {
+    if (t.completed || !t.time || !t.date) continue;
+    const taskDateTime = new Date(`${t.date}T${t.time}`);
+    if (isNaN(taskDateTime.getTime())) continue;
+    const diff = taskDateTime.getTime() - nowMs;
+    // Notify if task is within 15 min from now (and not more than 1 min past)
+    if (diff <= FIFTEEN_MIN && diff >= -60_000) {
+      dueSoon.push(t);
+    }
+  }
+  return dueSoon;
+}
+
 function requestNotificationPermission() {
   if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
@@ -37,6 +56,7 @@ async function sendBrowserNotification(title: string, body: string) {
 }
 
 const SESSION_KEY = "collegemate-notified-session";
+const TIME_NOTIFIED_KEY = "collegemate-time-notified";
 
 function hasNotifiedThisSession(): boolean {
   return sessionStorage.getItem(SESSION_KEY) === "true";
@@ -44,6 +64,20 @@ function hasNotifiedThisSession(): boolean {
 
 function markNotifiedThisSession() {
   sessionStorage.setItem(SESSION_KEY, "true");
+}
+
+function getTimeNotifiedIds(): Set<string> {
+  try {
+    return new Set(JSON.parse(sessionStorage.getItem(TIME_NOTIFIED_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function markTimeNotified(ids: string[]) {
+  const existing = getTimeNotifiedIds();
+  ids.forEach((id) => existing.add(id));
+  sessionStorage.setItem(TIME_NOTIFIED_KEY, JSON.stringify([...existing]));
 }
 
 export function useTaskReminders(tasks: Task[]) {
@@ -82,6 +116,29 @@ export function useTaskReminders(tasks: Task[]) {
     }
   }, []);
 
+  // Time-specific reminder check (runs every minute)
+  const checkTimeReminders = useCallback(() => {
+    const currentTasks = tasksRef.current;
+    if (currentTasks.length === 0) return;
+
+    const settings = getNotificationSettings();
+    if (!settings.enableDueToday) return;
+
+    const dueSoon = getTasksDueSoonByTime(currentTasks);
+    const alreadyNotified = getTimeNotifiedIds();
+    const newDueSoon = dueSoon.filter((t) => !alreadyNotified.has(t.id));
+
+    if (newDueSoon.length === 0) return;
+
+    for (const task of newDueSoon) {
+      const msg = `"${task.title}" is due at ${task.time}!`;
+      if (settings.enableToastReminders) toast.warning(`⏰ ${msg}`, { duration: 10000 });
+      if (settings.enablePushNotifications) sendBrowserNotification("⏰ Coming Up Soon", msg);
+    }
+
+    markTimeNotified(newDueSoon.map((t) => t.id));
+  }, []);
+
   useEffect(() => {
     const settings = getNotificationSettings();
     if (settings.enablePushNotifications) requestNotificationPermission();
@@ -93,6 +150,14 @@ export function useTaskReminders(tasks: Task[]) {
       checkReminders();
     }
   }, [tasks.length > 0, checkReminders]);
+
+  // Check time-specific reminders every minute
+  useEffect(() => {
+    if (tasks.length === 0) return;
+    checkTimeReminders(); // check immediately
+    const interval = setInterval(checkTimeReminders, 60_000);
+    return () => clearInterval(interval);
+  }, [tasks.length > 0, checkTimeReminders]);
 
   useEffect(() => {
     const settings = getNotificationSettings();
