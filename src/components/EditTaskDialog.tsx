@@ -20,8 +20,8 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
   const [title, setTitle] = useState(task.title);
   const [date, setDate] = useState(task.date);
   const [time, setTime] = useState(task.time || "");
-  const [priority, setPriority] = useState(task.priority);
-  const [category, setCategory] = useState(task.category);
+  const [priority, setPriority] = useState<string>(task.priority);
+  const [category, setCategory] = useState<string>(task.category);
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
