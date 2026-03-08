@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Camera, Save, User, Bell, Palette, Sun, Moon, Type } from "lucide-react";
+import { ArrowLeft, Camera, Save, User, Bell, Palette, Sun, Moon, Type, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
