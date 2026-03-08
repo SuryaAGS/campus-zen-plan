@@ -51,6 +51,7 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         navigateFallbackDenylist: [/^\/~oauth/],
+        importScripts: ["sw-push.js"],
       },
     }),
   ].filter(Boolean),
