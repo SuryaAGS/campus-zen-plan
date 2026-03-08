@@ -1,22 +1,31 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, LogIn, UserPlus } from "lucide-react";
+import { GraduationCap, LogIn, UserPlus, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const isLogin = mode === "login";
+  const isForgot = mode === "forgot";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    if (isLogin) {
+    if (isForgot) {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) toast.error(error.message);
+      else toast.success("Check your email for a password reset link!");
+    } else if (isLogin) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) toast.error(error.message);
     } else {
@@ -48,11 +57,11 @@ export default function Auth() {
         </div>
 
         <h2 className="mb-6 text-center font-display text-xl font-semibold text-card-foreground">
-          {isLogin ? "Welcome back!" : "Create your account"}
+          {isForgot ? "Reset your password" : isLogin ? "Welcome back!" : "Create your account"}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          {mode === "signup" && (
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Display Name</label>
               <input
@@ -76,25 +85,36 @@ export default function Auth() {
               required
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              required
-              minLength={6}
-            />
-          </div>
+          {!isForgot && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                required
+                minLength={6}
+              />
+              {isLogin && (
+                <button
+                  type="button"
+                  onClick={() => setMode("forgot")}
+                  className="mt-1 text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </button>
+              )}
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
             className="gradient-bg flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110 disabled:opacity-50"
           >
-            {isLogin ? <LogIn size={16} /> : <UserPlus size={16} />}
-            {loading ? "Please wait..." : isLogin ? "Sign In" : "Sign Up"}
+            {isForgot ? <KeyRound size={16} /> : isLogin ? <LogIn size={16} /> : <UserPlus size={16} />}
+            {loading ? "Please wait..." : isForgot ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
           </button>
         </form>
 
@@ -127,13 +147,21 @@ export default function Auth() {
         </button>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="font-medium text-primary hover:underline"
-          >
-            {isLogin ? "Sign Up" : "Sign In"}
-          </button>
+          {isForgot ? (
+            <button onClick={() => setMode("login")} className="font-medium text-primary hover:underline">
+              Back to Sign In
+            </button>
+          ) : (
+            <>
+              {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+              <button
+                onClick={() => setMode(isLogin ? "signup" : "login")}
+                className="font-medium text-primary hover:underline"
+              >
+                {isLogin ? "Sign Up" : "Sign In"}
+              </button>
+            </>
+          )}
         </p>
       </motion.div>
     </div>
