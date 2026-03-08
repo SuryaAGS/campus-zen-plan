@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { 
   GraduationCap, Moon, Sun, LogOut, UserCircle, CalendarDays, 
-  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2
+  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
@@ -276,14 +276,24 @@ const Dashboard = () => {
           transition={{ delay: 0.5 }}
           className="text-center"
         >
-          <button
-            onClick={() => navigate("/tasks")}
-            className="group inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card"
-          >
-            <ListTodo className="h-6 w-6" />
-            Manage Tasks
-            <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-          </button>
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
+            <button
+              onClick={() => navigate("/tasks")}
+              className="group inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card"
+            >
+              <Plus className="h-6 w-6" />
+              Add Task
+              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </button>
+            <button
+              onClick={() => navigate("/my-tasks")}
+              className="group inline-flex items-center gap-3 rounded-full border-2 border-primary bg-background px-8 py-4 text-lg font-semibold text-primary shadow-sm transition-all hover:scale-105 hover:bg-primary/5"
+            >
+              <ListTodo className="h-6 w-6" />
+              View Tasks
+              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </button>
+          </div>
         </motion.div>
       </div>
     </div>

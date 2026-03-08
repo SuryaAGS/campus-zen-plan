@@ -1,15 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { 
-  Plus, ArrowLeft, Filter, Settings, ArrowUpDown, Search, 
-  LayoutDashboard
+import {
+  ArrowLeft, Filter, Settings, ArrowUpDown, Search,
+  Plus, ListTodo, CheckCircle2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryColor } from "@/lib/categoryColors";
-import { refreshStreak, recordCompletion } from "@/lib/tasks";
+import { recordCompletion } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import TaskCard from "@/components/TaskCard";
@@ -17,17 +17,12 @@ import ProgressBar from "@/components/ProgressBar";
 import TaskReminders from "@/components/TaskReminders";
 import { useTaskReminders } from "@/hooks/useTaskReminders";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
-const TaskManager = () => {
+const MyTasks = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [title, setTitle] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [priority, setPriority] = useState<Task["priority"]>("High");
-  const [category, setCategory] = useState<string>("Assignment");
   const [filterCategory, setFilterCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<"date" | "priority" | "category">("date");
   const [searchQuery, setSearchQuery] = useState("");
@@ -82,7 +77,6 @@ const TaskManager = () => {
           } else if (newMissedCount === 2) {
             rescheduleTime.setHours(rescheduleTime.getHours() + 5);
           } else {
-            // 3rd+ miss → next day at 9:00 AM
             rescheduleTime.setDate(rescheduleTime.getDate() + 1);
             rescheduleTime.setHours(9, 0, 0, 0);
           }
@@ -113,7 +107,6 @@ const TaskManager = () => {
           duration: 6000,
         });
 
-        // Browser push notification
         if (Notification.permission === "granted") {
           overdue.forEach((t) => {
             new Notification("Task Rescheduled", {
@@ -126,61 +119,26 @@ const TaskManager = () => {
         }
       }
 
-      // Map back to Task type for state
       const taskState: Task[] = mapped.map(({ missedCount, ...rest }) => rest);
       setTasks(taskState);
-    } catch (err) {
+    } catch {
       toast.error("Something went wrong loading tasks");
     }
   }, []);
 
   useEffect(() => {
     fetchTasks();
-    // Re-check every 60 seconds for newly missed tasks
     const interval = setInterval(fetchTasks, 60000);
     return () => clearInterval(interval);
   }, [fetchTasks]);
 
-  const addTask = async () => {
-    if (!title || !date || !user) return;
-    try {
-      const { error } = await supabase.from("tasks").insert({
-        user_id: user.id,
-        title,
-        date,
-        time: time || null,
-        priority,
-        category,
-      } as any);
-      if (error) {
-        toast.error("Failed to add task");
-        return;
-      }
-      toast.success("Task added!");
-      setTitle("");
-      setDate("");
-      setTime("");
-      fetchTasks();
-    } catch {
-      toast.error("Failed to add task");
-    }
-  };
-
   const completeTask = async (id: string) => {
     try {
       const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
-      if (error) {
-        toast.error("Failed to complete task");
-        return;
-      }
+      if (error) { toast.error("Failed to complete task"); return; }
       recordCompletion();
       try {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.7 },
-          colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
-        });
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"] });
       } catch {}
       fetchTasks();
     } catch {}
@@ -189,10 +147,7 @@ const TaskManager = () => {
   const uncompleteTask = async (id: string) => {
     try {
       const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
-      if (error) {
-        toast.error("Failed to undo completion");
-        return;
-      }
+      if (error) { toast.error("Failed to undo completion"); return; }
       fetchTasks();
     } catch {}
   };
@@ -200,10 +155,7 @@ const TaskManager = () => {
   const deleteTask = async (id: string) => {
     try {
       const { error } = await supabase.from("tasks").delete().eq("id", id);
-      if (error) {
-        toast.error("Failed to delete task");
-        return;
-      }
+      if (error) { toast.error("Failed to delete task"); return; }
       fetchTasks();
     } catch {}
   };
@@ -211,10 +163,7 @@ const TaskManager = () => {
   const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => {
     try {
       const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
-      if (error) {
-        toast.error("Failed to update task");
-        return;
-      }
+      if (error) { toast.error("Failed to update task"); return; }
       toast.success("Task updated");
       fetchTasks();
     } catch {}
@@ -235,6 +184,7 @@ const TaskManager = () => {
 
   const pending = sortTasks(filtered.filter((t) => !t.completed));
   const completed = sortTasks(filtered.filter((t) => t.completed));
+  const progressPercent = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
@@ -248,97 +198,57 @@ const TaskManager = () => {
             <ArrowLeft size={16} />
             Dashboard
           </button>
-          <h1 className="font-display text-xl font-bold text-foreground">Task Manager</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">My Tasks</h1>
           <button
-            onClick={() => navigate("/dashboard")}
-            className="rounded-full bg-primary/10 p-2 text-primary transition-all hover:bg-primary/20"
+            onClick={() => navigate("/tasks")}
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:brightness-110"
           >
-            <LayoutDashboard size={18} />
+            <Plus size={16} />
+            Add
           </button>
         </div>
       </div>
 
       <div className="container mx-auto max-w-3xl px-4 py-6">
-        {/* Add Task Form */}
+        {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          className="mb-5 grid grid-cols-3 gap-3"
         >
-          <Card className="mb-6 border-none shadow-elevated">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Plus className="h-5 w-5 text-primary" />
-                Add New Task
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
-                <div className="sm:col-span-2 lg:flex-1 lg:min-w-[180px]">
-                  <label className="mb-1 block text-xs font-medium text-muted-foreground">Task</label>
-                  <input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. Study for midterms"
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    onKeyDown={(e) => e.key === "Enter" && addTask()}
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-muted-foreground">Due Date</label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-muted-foreground">Time</label>
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>
-                  <select
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value as Task["priority"])}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  >
-                    <option value="High">🔴 High</option>
-                    <option value="Medium">🟡 Medium</option>
-                    <option value="Low">🟢 Low</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  >
-                    {allCategoryNames.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="sm:col-span-2 lg:col-span-1">
-                  <button
-                    onClick={addTask}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:brightness-110 lg:w-auto"
-                  >
-                    <Plus size={16} /> Add Task
-                  </button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="rounded-xl bg-card p-3 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
+              <ListTodo size={14} />
+              <span className="text-xs">Pending</span>
+            </div>
+            <p className="mt-1 text-xl font-bold text-foreground">{tasks.filter(t => !t.completed).length}</p>
+          </div>
+          <div className="rounded-xl bg-card p-3 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
+              <CheckCircle2 size={14} />
+              <span className="text-xs">Done</span>
+            </div>
+            <p className="mt-1 text-xl font-bold text-foreground">{tasks.filter(t => t.completed).length}</p>
+          </div>
+          <div className="rounded-xl bg-card p-3 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
+              <span className="text-xs">Progress</span>
+            </div>
+            <p className="mt-1 text-xl font-bold text-primary">{progressPercent}%</p>
+          </div>
         </motion.div>
 
-        {/* Search + Filter Bar */}
+        {/* Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.05 }}
+          className="mb-5"
+        >
+          <Progress value={progressPercent} className="h-2" />
+        </motion.div>
+
+        {/* Search + Filter */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -413,12 +323,25 @@ const TaskManager = () => {
           className="mb-6 space-y-3"
         >
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-            📌 Tasks
+            📌 Pending Tasks
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-sm text-primary">{pending.length}</span>
           </h2>
           <AnimatePresence>
             {pending.length === 0 && (
-              <p className="text-sm text-muted-foreground">No pending tasks. Add one above!</p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center gap-3 rounded-xl bg-card py-10 text-center shadow-sm"
+              >
+                <ListTodo size={40} className="text-muted-foreground/40" />
+                <p className="text-sm text-muted-foreground">No pending tasks!</p>
+                <button
+                  onClick={() => navigate("/tasks")}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:brightness-110"
+                >
+                  <Plus size={14} /> Add a task
+                </button>
+              </motion.div>
             )}
             {pending.map((task, i) => (
               <TaskCard
@@ -462,18 +385,9 @@ const TaskManager = () => {
             </AnimatePresence>
           </motion.div>
         )}
-
-        {/* Progress */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <ProgressBar completed={completed.length} total={tasks.length} />
-        </motion.div>
       </div>
     </div>
   );
 };
 
-export default TaskManager;
+export default MyTasks;
