@@ -264,7 +264,7 @@ const Index = () => {
           {/* Filter Bar */}
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Filter size={16} className="text-primary-foreground/70" />
-            {(["All", ...CATEGORIES] as const).map((c) => (
+            {["All", ...allCategoryNames].map((c) => (
               <button
                 key={c}
                 onClick={() => setFilterCategory(c)}
@@ -277,6 +277,13 @@ const Index = () => {
                 {c}
               </button>
             ))}
+            <button
+              onClick={() => navigate("/categories")}
+              className="rounded-full bg-primary-foreground/10 p-1.5 text-primary-foreground/70 transition-all hover:bg-primary-foreground/20"
+              aria-label="Manage categories"
+            >
+              <Settings size={14} />
+            </button>
           </div>
 
           {/* Tasks */}
