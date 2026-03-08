@@ -323,7 +323,7 @@ const Index = () => {
               <h2 className="font-display text-lg font-semibold text-primary-foreground">✅ Completed ({completed.length})</h2>
               <AnimatePresence>
                 {completed.map((task, i) => (
-                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
+                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onUncomplete={uncompleteTask} onDelete={deleteTask} />
                 ))}
               </AnimatePresence>
             </div>
