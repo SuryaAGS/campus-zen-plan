@@ -19,7 +19,7 @@ const Categories = () => {
     <div className="gradient-bg min-h-screen">
       <div className="container mx-auto max-w-lg px-4 py-8">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="mb-6 flex items-center gap-2 text-sm font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground"
         >
           <ArrowLeft size={16} /> Back
