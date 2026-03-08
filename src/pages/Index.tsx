@@ -312,7 +312,18 @@ const Index = () => {
             </div>
           </motion.div>
 
-          {/* Filter Bar */}
+          {/* Search + Filter Bar */}
+          <div className="mb-2 flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search tasks..."
+                className="w-full rounded-full border border-input bg-card pl-9 pr-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          </div>
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Filter size={16} className="text-primary-foreground/70" />
             {["All", ...allCategoryNames].map((c) => {
