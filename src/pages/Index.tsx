@@ -56,6 +56,12 @@ const Index = () => {
   const completeTask = (id: string) => {
     persist(tasks.map((t) => (t.id === id ? { ...t, completed: true } : t)));
     setStreak(recordCompletion());
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.7 },
+      colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
+    });
   };
   const deleteTask = (id: string) => persist(tasks.filter((t) => t.id !== id));
 
