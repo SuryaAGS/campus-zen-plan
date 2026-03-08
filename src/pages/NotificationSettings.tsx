@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Bell, BellOff, MessageSquare, Smartphone, LayoutList, Clock, CalendarCheck, CalendarClock } from "lucide-react";
+import { ArrowLeft, Bell, MessageSquare, Smartphone, LayoutList, Clock, CalendarCheck, CalendarClock, Loader2, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { getNotificationSettings, saveNotificationSettings, NotificationSettings, DEFAULT_SETTINGS } from "@/lib/notificationSettings";
+import { usePushSubscription } from "@/hooks/usePushSubscription";
 
 export default function NotificationSettingsPage() {
   const navigate = useNavigate();
   const [settings, setSettings] = useState<NotificationSettings>(getNotificationSettings);
+  const { isSubscribed, isSupported: pushSupported, isLoading: pushLoading, subscribe, unsubscribe } = usePushSubscription();
 
   const update = (patch: Partial<NotificationSettings>) => {
     const next = { ...settings, ...patch };
@@ -22,17 +24,38 @@ export default function NotificationSettingsPage() {
     toast.success("Settings reset to defaults");
   };
 
-  const pushSupported = "Notification" in window;
-  const pushPermission = pushSupported ? Notification.permission : "denied";
+  const pushPermission = ("Notification" in window) ? Notification.permission : "denied";
 
   const requestPush = async () => {
-    if (!pushSupported) return;
+    if (!("Notification" in window)) return;
     const result = await Notification.requestPermission();
     if (result === "granted") {
       update({ enablePushNotifications: true });
       toast.success("Push notifications enabled!");
     } else {
       toast.error("Permission denied. Enable in browser settings.");
+    }
+  };
+
+  const handleBackgroundPushToggle = async () => {
+    if (isSubscribed) {
+      const success = await unsubscribe();
+      if (success) toast.success("Background notifications disabled");
+    } else {
+      if ("Notification" in window && Notification.permission === "default") {
+        const result = await Notification.requestPermission();
+        if (result !== "granted") {
+          toast.error("Permission denied. Enable in browser settings.");
+          return;
+        }
+      }
+      if ("Notification" in window && Notification.permission === "denied") {
+        toast.error("Notifications blocked. Enable in browser settings.");
+        return;
+      }
+      const success = await subscribe();
+      if (success) toast.success("Background notifications enabled!");
+      else toast.error("Failed to enable background notifications");
     }
   };
 
@@ -104,7 +127,7 @@ export default function NotificationSettingsPage() {
                     <div>
                       <p className="text-sm font-medium text-foreground">Push notifications</p>
                       <p className="text-xs text-muted-foreground">
-                        {!pushSupported
+                        {!("Notification" in window)
                           ? "Not supported in this browser"
                           : pushPermission === "granted"
                           ? "Browser notifications when tasks are due"
@@ -114,12 +137,12 @@ export default function NotificationSettingsPage() {
                       </p>
                     </div>
                   </div>
-                  {pushSupported && pushPermission === "granted" ? (
+                  {"Notification" in window && pushPermission === "granted" ? (
                     <Switch
                       checked={settings.enablePushNotifications}
                       onCheckedChange={(v) => update({ enablePushNotifications: v })}
                     />
-                  ) : pushSupported && pushPermission === "default" ? (
+                  ) : "Notification" in window && pushPermission === "default" ? (
                     <button
                       onClick={requestPush}
                       className="shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
@@ -127,6 +150,44 @@ export default function NotificationSettingsPage() {
                       Enable
                     </button>
                   ) : null}
+                </div>
+
+                {/* Background Push (server-side) */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 text-muted-foreground">
+                      <Zap size={18} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Background notifications</p>
+                      <p className="text-xs text-muted-foreground">
+                        {!pushSupported
+                          ? "Not supported in this browser"
+                          : isSubscribed
+                          ? "Receive reminders even when the app is closed"
+                          : "Get notified about tasks even when offline"}
+                      </p>
+                    </div>
+                  </div>
+                  {pushSupported && (
+                    <button
+                      onClick={handleBackgroundPushToggle}
+                      disabled={pushLoading}
+                      className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                        isSubscribed
+                          ? "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                          : "bg-primary text-primary-foreground hover:bg-primary/90"
+                      }`}
+                    >
+                      {pushLoading ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : isSubscribed ? (
+                        "Disable"
+                      ) : (
+                        "Enable"
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
