@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, CATEGORIES, Category } from "@/types/task";
 import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 
 const Index = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -128,6 +130,13 @@ const Index = () => {
     <div className="min-h-screen">
       {/* Top Controls */}
       <div className="fixed right-4 top-4 z-50 flex gap-2">
+        <button
+          onClick={() => navigate("/profile")}
+          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          aria-label="Profile"
+        >
+          <UserCircle size={20} className="text-foreground" />
+        </button>
         <button
           onClick={() => setDark((d) => !d)}
           className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
