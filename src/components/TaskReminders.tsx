@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, Clock, X, AlarmClockOff } from "lucide-react";
+import { AlertTriangle, Clock, X } from "lucide-react";
 import { Task } from "@/types/task";
 import { toast } from "sonner";
 import { getNotificationSettings } from "@/lib/notificationSettings";
+import SnoozeMenu from "@/components/SnoozeMenu";
 
 interface TaskRemindersProps {
   dueToday: Task[];
@@ -33,11 +34,11 @@ const TaskReminders = ({ dueToday, dueTomorrow }: TaskRemindersProps) => {
   const now = Date.now();
   const isActive = (key: string) => !snoozed[key] || snoozed[key] < now;
 
-  const snooze = (key: string, label: string) => {
-    const updated = { ...snoozed, [key]: now + 30 * 60 * 1000 };
+  const snooze = (key: string, label: string, minutes: number) => {
+    const updated = { ...snoozed, [key]: now + minutes * 60 * 1000 };
     setSnoozed(updated);
     setSnoozedState(updated);
-    toast.info(`${label} snoozed for 30 minutes`);
+    toast.info(`${label} snoozed for ${minutes} minutes`);
   };
 
   if (!settings.enableReminderBanners) return null;
@@ -72,14 +73,10 @@ const TaskReminders = ({ dueToday, dueTomorrow }: TaskRemindersProps) => {
               </ul>
             </div>
             <div className="flex shrink-0 gap-1">
-              <button
-                onClick={() => snooze("today", "Due today")}
-                className="rounded-full p-1 text-destructive/60 transition-colors hover:bg-destructive/20 hover:text-destructive"
-                aria-label="Snooze 30 min"
-                title="Snooze 30 min"
-              >
-                <AlarmClockOff size={14} />
-              </button>
+              <SnoozeMenu
+                variant="destructive"
+                onSnooze={(min) => snooze("today", "Due today", min)}
+              />
               <button
                 onClick={() => setDismissedToday(true)}
                 className="rounded-full p-1 text-destructive/60 transition-colors hover:bg-destructive/20 hover:text-destructive"
@@ -110,14 +107,10 @@ const TaskReminders = ({ dueToday, dueTomorrow }: TaskRemindersProps) => {
               </ul>
             </div>
             <div className="flex shrink-0 gap-1">
-              <button
-                onClick={() => snooze("tomorrow", "Due tomorrow")}
-                className="rounded-full p-1 text-accent-foreground/60 transition-colors hover:bg-accent-foreground/10 hover:text-accent-foreground"
-                aria-label="Snooze 30 min"
-                title="Snooze 30 min"
-              >
-                <AlarmClockOff size={14} />
-              </button>
+              <SnoozeMenu
+                variant="accent"
+                onSnooze={(min) => snooze("tomorrow", "Due tomorrow", min)}
+              />
               <button
                 onClick={() => setDismissedTomorrow(true)}
                 className="rounded-full p-1 text-accent-foreground/60 transition-colors hover:bg-accent-foreground/10 hover:text-accent-foreground"
