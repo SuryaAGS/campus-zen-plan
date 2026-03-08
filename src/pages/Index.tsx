@@ -29,6 +29,7 @@ const Index = () => {
   const [category, setCategory] = useState<string>("Assignment");
   const [filterCategory, setFilterCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<"date" | "priority" | "category">("date");
+  const [searchQuery, setSearchQuery] = useState("");
   const { allCategoryNames } = useCategories();
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
