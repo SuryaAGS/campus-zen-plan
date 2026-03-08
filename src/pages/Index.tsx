@@ -13,6 +13,8 @@ import TaskCard from "@/components/TaskCard";
 import ProgressBar from "@/components/ProgressBar";
 import AiSuggestion from "@/components/AiSuggestion";
 import StreakBadge from "@/components/StreakBadge";
+import TaskReminders from "@/components/TaskReminders";
+import { useTaskReminders } from "@/hooks/useTaskReminders";
 import { toast } from "sonner";
 
 const Index = () => {
