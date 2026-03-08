@@ -151,12 +151,14 @@ const Index = () => {
         return;
       }
       setStreak(recordCompletion());
-      confetti({
-        particleCount: 80,
-        spread: 70,
-        origin: { y: 0.7 },
-        colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
-      });
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.7 },
+          colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
+        });
+      } catch (_) {}
       fetchTasks();
     } catch (err) {
       console.error("completeTask error:", err);
