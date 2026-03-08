@@ -89,6 +89,26 @@ const Dashboard = () => {
   const highPriority = pending.filter((t) => t.priority === "High");
   const progressPercent = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
 
+  const weeklyData = useMemo(() => {
+    const days: { day: string; date: string; completed: number; total: number }[] = [];
+    const now = new Date();
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      const dayTasks = (data || []).filter((t: any) => t.date === dateStr);
+      const dayCompleted = dayTasks.filter((t: any) => t.completed);
+      days.push({
+        day: i === 0 ? "Today" : dayNames[d.getDay()],
+        date: dateStr,
+        completed: dayCompleted.length,
+        total: dayTasks.length,
+      });
+    }
+    return days;
+  }, [data]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
