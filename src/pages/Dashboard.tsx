@@ -276,23 +276,33 @@ const Dashboard = () => {
         </motion.div>
 
         {/* AI Rescheduled Tasks */}
-        {rescheduledTasks.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="mb-8"
-          >
-            <Card className="border-none shadow-elevated">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <RefreshCw className="h-5 w-5 text-primary" />
-                  AI Rescheduled Tasks
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="mb-8"
+        >
+          <Card className="border-none shadow-elevated">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <RefreshCw className="h-5 w-5 text-primary" />
+                AI Rescheduled Tasks
+                {rescheduledTasks.length > 0 && (
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-sm text-primary">{rescheduledTasks.length}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {rescheduledTasks.map((t) => (
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {rescheduledTasks.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                    <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">No rescheduled tasks</p>
+                  <p className="text-xs text-muted-foreground/70">Overdue tasks will appear here when auto-rescheduled</p>
+                </div>
+              ) : (
+                rescheduledTasks.map((t) => (
                   <div
                     key={t.id}
                     className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3"
@@ -308,11 +318,11 @@ const Dashboard = () => {
                       {t.missedCount}×
                     </span>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
 
 
         <motion.div
