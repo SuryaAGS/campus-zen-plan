@@ -153,16 +153,16 @@ const Index = () => {
       {/* Profile - Left */}
       <button
         onClick={() => navigate("/profile")}
-        className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-full bg-card px-3 py-2 shadow-elevated transition-all hover:scale-105"
+        className="fixed left-3 top-3 z-50 flex items-center gap-1.5 rounded-full bg-card px-2 py-1 shadow-elevated transition-all hover:scale-105"
         aria-label="Profile"
       >
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt="Avatar" className="h-7 w-7 rounded-full object-cover" />
+          <img src={profile.avatar_url} alt="Avatar" className="h-5 w-5 rounded-full object-cover" />
         ) : (
-          <UserCircle size={20} className="text-foreground" />
+          <UserCircle size={16} className="text-foreground" />
         )}
         {profile.display_name && (
-          <span className="max-w-[120px] truncate text-sm font-medium text-foreground">
+          <span className="max-w-[90px] truncate text-xs font-medium text-foreground">
             {profile.display_name}
           </span>
         )}
