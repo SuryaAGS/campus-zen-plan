@@ -24,6 +24,7 @@ const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("High");
   const [category, setCategory] = useState<string>("Assignment");
   const [filterCategory, setFilterCategory] = useState<string>("All");
