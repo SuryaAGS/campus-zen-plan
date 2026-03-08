@@ -6,11 +6,14 @@ import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
 
 export default function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const isLogin = mode === "login";
+  const isForgot = mode === "forgot";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
