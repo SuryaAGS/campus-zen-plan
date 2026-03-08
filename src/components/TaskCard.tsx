@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { Check, Trash2 } from "lucide-react";
 import { Task } from "@/types/task";
@@ -31,9 +32,10 @@ const categoryEmojis: Record<string, string> = {
   Other: "📌",
 };
 
-export default function TaskCard({ task, index, onComplete, onDelete }: TaskCardProps) {
+const TaskCard = forwardRef<HTMLDivElement, TaskCardProps>(({ task, index, onComplete, onDelete }, ref) => {
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -50 }}
@@ -72,4 +74,8 @@ export default function TaskCard({ task, index, onComplete, onDelete }: TaskCard
       </div>
     </motion.div>
   );
-}
+});
+
+TaskCard.displayName = "TaskCard";
+
+export default TaskCard;
