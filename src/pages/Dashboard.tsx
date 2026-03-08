@@ -249,12 +249,12 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* Streak & AI Row */}
+        {/* Streak */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mb-8 grid gap-4 sm:grid-cols-2"
+          className="mb-8"
         >
           <Card className="border-none bg-gradient-to-br from-accent to-accent/50 shadow-elevated">
             <CardContent className="flex items-center gap-4 p-5">
@@ -265,12 +265,6 @@ const Dashboard = () => {
                 <p className="text-3xl font-bold text-accent-foreground">{streak.current}</p>
                 <p className="text-sm text-accent-foreground/80">Day Streak 🔥</p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-elevated">
-            <CardContent className="p-5">
-              <AiSuggestion tip={getAiSuggestion(tasks)} />
             </CardContent>
           </Card>
         </motion.div>
