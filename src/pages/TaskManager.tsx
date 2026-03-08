@@ -51,7 +51,7 @@ const TaskManager = () => {
       tomorrow.setDate(tomorrow.getDate() + 1);
       const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-      const mapped: Task[] = (data || []).map((t) => ({
+      const mapped = (data || []).map((t) => ({
         id: t.id,
         title: t.title,
         date: t.date || tomorrowStr,
@@ -59,9 +59,10 @@ const TaskManager = () => {
         priority: (t.priority as Task["priority"]) || "Medium",
         category: (t.category as Category) || "Other",
         completed: !!t.completed,
+        missedCount: (t as any).missed_count ?? 0,
       }));
 
-      // Auto-reschedule overdue tasks (time-aware: 3 hours ahead)
+      // Auto-reschedule overdue tasks with progressive delay
       const now = new Date();
       const overdue = mapped.filter((t) => {
         if (t.completed) return false;
@@ -70,27 +71,44 @@ const TaskManager = () => {
       });
 
       if (overdue.length > 0) {
-        const rescheduleTime = new Date();
-        rescheduleTime.setHours(rescheduleTime.getHours() + 3);
-        const newDate = rescheduleTime.toISOString().split("T")[0];
-        const newTime = rescheduleTime.toTimeString().slice(0, 5);
-
-        const taskNames = overdue.slice(0, 3).map((t) => `"${t.title}"`).join(", ");
-        const extra = overdue.length > 3 ? ` and ${overdue.length - 3} more` : "";
+        const updates: Promise<any>[] = [];
 
         for (const task of overdue) {
+          const newMissedCount = task.missedCount + 1;
+          const rescheduleTime = new Date();
+
+          if (newMissedCount === 1) {
+            rescheduleTime.setHours(rescheduleTime.getHours() + 3);
+          } else if (newMissedCount === 2) {
+            rescheduleTime.setHours(rescheduleTime.getHours() + 5);
+          } else {
+            // 3rd+ miss → next day at 9:00 AM
+            rescheduleTime.setDate(rescheduleTime.getDate() + 1);
+            rescheduleTime.setHours(9, 0, 0, 0);
+          }
+
+          const newDate = rescheduleTime.toISOString().split("T")[0];
+          const newTime = rescheduleTime.toTimeString().slice(0, 5);
+
           task.date = newDate;
           task.time = newTime;
+          task.missedCount = newMissedCount;
+
+          updates.push(
+            supabase.from("tasks").update({
+              date: newDate,
+              time: newTime,
+              missed_count: newMissedCount,
+            } as any).eq("id", task.id)
+          );
         }
 
-        // Batch update in DB
-        Promise.all(
-          overdue.map((t) =>
-            supabase.from("tasks").update({ date: newDate, time: newTime }).eq("id", t.id)
-          )
-        );
+        Promise.all(updates);
 
-        toast.info(`🔄 ${overdue.length} missed task${overdue.length > 1 ? "s" : ""} rescheduled to ${newTime}`, {
+        const taskNames = overdue.slice(0, 3).map((t) => `"${t.title}" → ${t.time}`).join(", ");
+        const extra = overdue.length > 3 ? ` +${overdue.length - 3} more` : "";
+
+        toast.info(`🔄 ${overdue.length} missed task${overdue.length > 1 ? "s" : ""} rescheduled`, {
           description: `${taskNames}${extra}`,
           duration: 6000,
         });
@@ -99,7 +117,7 @@ const TaskManager = () => {
         if (Notification.permission === "granted") {
           overdue.forEach((t) => {
             new Notification("Task Rescheduled", {
-              body: `"${t.title}" moved to ${newTime}`,
+              body: `"${t.title}" moved to ${t.date} ${t.time}`,
               icon: "/pwa-192x192.png",
             });
           });
@@ -108,7 +126,9 @@ const TaskManager = () => {
         }
       }
 
-      setTasks(mapped);
+      // Map back to Task type for state
+      const taskState: Task[] = mapped.map(({ missedCount, ...rest }) => rest);
+      setTasks(taskState);
     } catch (err) {
       toast.error("Something went wrong loading tasks");
     }
