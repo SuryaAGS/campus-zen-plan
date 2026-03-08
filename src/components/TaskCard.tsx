@@ -11,7 +11,7 @@ interface TaskCardProps {
   onComplete: (id: string) => void;
   onUncomplete?: (id: string) => void;
   onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => void;
-  onDelete: (id: string);
+  onDelete: (id: string) => void;
   allCategories: string[];
 }
 
