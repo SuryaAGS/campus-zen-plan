@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, CATEGORIES, Category } from "@/types/task";
 import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
