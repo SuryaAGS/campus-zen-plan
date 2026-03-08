@@ -150,28 +150,26 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Top Controls */}
+      {/* Profile - Left */}
+      <button
+        onClick={() => navigate("/profile")}
+        className="fixed left-4 top-4 z-50 flex items-center gap-2 rounded-full bg-card px-3 py-2 shadow-elevated transition-all hover:scale-105"
+        aria-label="Profile"
+      >
+        {profile.avatar_url ? (
+          <img src={profile.avatar_url} alt="Avatar" className="h-7 w-7 rounded-full object-cover" />
+        ) : (
+          <UserCircle size={20} className="text-foreground" />
+        )}
+        {profile.display_name && (
+          <span className="max-w-[120px] truncate text-sm font-medium text-foreground">
+            {profile.display_name}
+          </span>
+        )}
+      </button>
+
+      {/* Controls - Right */}
       <div className="fixed right-4 top-4 z-50 flex items-center gap-2">
-        <button
-          onClick={() => navigate("/profile")}
-          className="flex items-center gap-2 rounded-full bg-card px-3 py-2 shadow-elevated transition-all hover:scale-105"
-          aria-label="Profile"
-        >
-          {profile.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt="Avatar"
-              className="h-7 w-7 rounded-full object-cover"
-            />
-          ) : (
-            <UserCircle size={20} className="text-foreground" />
-          )}
-          {profile.display_name && (
-            <span className="hidden sm:inline max-w-[100px] truncate text-sm font-medium text-foreground">
-              {profile.display_name}
-            </span>
-          )}
-        </button>
         <button
           onClick={() => setDark((d) => !d)}
           className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
