@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
+import { getCategoryColor } from "@/lib/categoryColors";
 import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -267,19 +268,23 @@ const Index = () => {
           {/* Filter Bar */}
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Filter size={16} className="text-primary-foreground/70" />
-            {["All", ...allCategoryNames].map((c) => (
-              <button
-                key={c}
-                onClick={() => setFilterCategory(c)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
-                  filterCategory === c
-                    ? "bg-card text-foreground shadow-card"
-                    : "bg-primary-foreground/10 text-primary-foreground/80 hover:bg-primary-foreground/20"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
+            {["All", ...allCategoryNames].map((c) => {
+              const color = c !== "All" ? getCategoryColor(c) : null;
+              return (
+                <button
+                  key={c}
+                  onClick={() => setFilterCategory(c)}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                    filterCategory === c
+                      ? "bg-card text-foreground shadow-card"
+                      : "bg-primary-foreground/10 text-primary-foreground/80 hover:bg-primary-foreground/20"
+                  }`}
+                >
+                  {color && <span className={`inline-block h-2 w-2 rounded-full ${color.dot}`} />}
+                  {c}
+                </button>
+              );
+            })}
             <button
               onClick={() => navigate("/categories")}
               className="rounded-full bg-primary-foreground/10 p-1.5 text-primary-foreground/70 transition-all hover:bg-primary-foreground/20"

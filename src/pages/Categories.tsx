@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Trash2, Tag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCategories } from "@/hooks/useCategories";
 import { CATEGORIES } from "@/types/task";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -38,9 +39,10 @@ const Categories = () => {
             {CATEGORIES.map((c) => (
               <span
                 key={c}
-                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground"
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${getCategoryColor(c).bg} ${getCategoryColor(c).text}`}
               >
-                <Tag size={12} /> {c}
+                <span className={`inline-block h-2.5 w-2.5 rounded-full ${getCategoryColor(c).dot}`} />
+                {c}
               </span>
             ))}
           </div>
@@ -84,7 +86,7 @@ const Categories = () => {
                     className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2"
                   >
                     <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <Tag size={14} className="text-secondary" /> {cat.name}
+                      <span className={`inline-block h-3 w-3 rounded-full ${getCategoryColor(cat.name).dot}`} /> {cat.name}
                     </span>
                     <button
                       onClick={() => deleteCategory(cat.id)}
