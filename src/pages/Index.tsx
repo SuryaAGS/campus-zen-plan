@@ -171,8 +171,18 @@ const Index = () => {
 
   const reminders = useTaskReminders(tasks);
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
-  const pending = filtered.filter((t) => !t.completed);
-  const completed = filtered.filter((t) => t.completed);
+
+  const priorityOrder: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
+  const sortTasks = (list: Task[]) => {
+    return [...list].sort((a, b) => {
+      if (sortBy === "date") return a.date.localeCompare(b.date) || (a.time || "").localeCompare(b.time || "");
+      if (sortBy === "priority") return priorityOrder[a.priority] - priorityOrder[b.priority];
+      return a.category.localeCompare(b.category);
+    });
+  };
+
+  const pending = sortTasks(filtered.filter((t) => !t.completed));
+  const completed = sortTasks(filtered.filter((t) => t.completed));
 
   const scrollToApp = () => {
     appRef.current?.scrollIntoView({ behavior: "smooth" });
