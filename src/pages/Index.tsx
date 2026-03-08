@@ -167,7 +167,7 @@ const Index = () => {
             <UserCircle size={20} className="text-foreground" />
           )}
           {profile.display_name && (
-            <span className="max-w-[120px] truncate text-sm font-medium text-foreground">
+            <span className="hidden sm:inline max-w-[100px] truncate text-sm font-medium text-foreground">
               {profile.display_name}
             </span>
           )}
