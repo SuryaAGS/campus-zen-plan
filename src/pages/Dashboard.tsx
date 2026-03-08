@@ -275,7 +275,46 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* CTA Button */}
+        {/* AI Rescheduled Tasks */}
+        {rescheduledTasks.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="mb-8"
+          >
+            <Card className="border-none shadow-elevated">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <RefreshCw className="h-5 w-5 text-primary" />
+                  AI Rescheduled Tasks
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-sm text-primary">{rescheduledTasks.length}</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {rescheduledTasks.map((t) => (
+                  <div
+                    key={t.id}
+                    className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{t.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Moved to {t.date}{t.time ? ` at ${t.time}` : ""} · Rescheduled {t.missedCount}×
+                      </p>
+                    </div>
+                    <span className="ml-3 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      <RefreshCw size={12} />
+                      {t.missedCount}×
+                    </span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
+
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
