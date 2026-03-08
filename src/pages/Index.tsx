@@ -1,16 +1,20 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut } from "lucide-react";
 import mascot from "@/assets/mascot.png";
 import { Task, CATEGORIES, Category } from "@/types/task";
-import { loadTasks, saveTasks, getAiSuggestion, autoReschedule, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
+import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import TaskCard from "@/components/TaskCard";
 import ProgressBar from "@/components/ProgressBar";
 import AiSuggestion from "@/components/AiSuggestion";
 import StreakBadge from "@/components/StreakBadge";
+import { toast } from "sonner";
 
 const Index = () => {
+  const { user, signOut } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
@@ -26,35 +30,73 @@ const Index = () => {
     localStorage.setItem("collegemate-dark", String(dark));
   }, [dark]);
 
-  useEffect(() => {
-    const loaded = autoReschedule(loadTasks());
-    setTasks(loaded);
-    saveTasks(loaded);
+  // Load tasks from Supabase
+  const fetchTasks = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      toast.error("Failed to load tasks");
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+    const mapped: Task[] = [];
+    for (const t of data || []) {
+      const task: Task = {
+        id: t.id,
+        title: t.title,
+        date: t.date,
+        priority: t.priority as Task["priority"],
+        category: t.category as Category,
+        completed: t.completed,
+      };
+      if (!task.completed && new Date(task.date) < today) {
+        task.date = tomorrowStr;
+        await supabase.from("tasks").update({ date: tomorrowStr }).eq("id", task.id);
+      }
+      mapped.push(task);
+    }
+
+    setTasks(mapped);
     setStreak(refreshStreak());
   }, []);
 
-  const persist = useCallback((updated: Task[]) => {
-    setTasks(updated);
-    saveTasks(updated);
-  }, []);
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
-  const addTask = () => {
-    if (!title || !date) return;
-    const newTask: Task = {
-      id: crypto.randomUUID(),
+  const addTask = async () => {
+    if (!title || !date || !user) return;
+    const { error } = await supabase.from("tasks").insert({
+      user_id: user.id,
       title,
       date,
       priority,
       category,
-      completed: false,
-    };
-    persist([...tasks, newTask]);
+    });
+    if (error) {
+      toast.error("Failed to add task");
+      return;
+    }
     setTitle("");
     setDate("");
+    fetchTasks();
   };
 
-  const completeTask = (id: string) => {
-    persist(tasks.map((t) => (t.id === id ? { ...t, completed: true } : t)));
+  const completeTask = async (id: string) => {
+    const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
+    if (error) {
+      toast.error("Failed to complete task");
+      return;
+    }
     setStreak(recordCompletion());
     confetti({
       particleCount: 80,
@@ -62,8 +104,17 @@ const Index = () => {
       origin: { y: 0.7 },
       colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
     });
+    fetchTasks();
   };
-  const deleteTask = (id: string) => persist(tasks.filter((t) => t.id !== id));
+
+  const deleteTask = async (id: string) => {
+    const { error } = await supabase.from("tasks").delete().eq("id", id);
+    if (error) {
+      toast.error("Failed to delete task");
+      return;
+    }
+    fetchTasks();
+  };
 
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
   const pending = filtered.filter((t) => !t.completed);
@@ -75,14 +126,24 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Dark Mode Toggle */}
-      <button
-        onClick={() => setDark((d) => !d)}
-        className="fixed right-4 top-4 z-50 rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
-        aria-label="Toggle dark mode"
-      >
-        {dark ? <Sun size={20} className="text-foreground" /> : <Moon size={20} className="text-foreground" />}
-      </button>
+      {/* Top Controls */}
+      <div className="fixed right-4 top-4 z-50 flex gap-2">
+        <button
+          onClick={() => setDark((d) => !d)}
+          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          aria-label="Toggle dark mode"
+        >
+          {dark ? <Sun size={20} className="text-foreground" /> : <Moon size={20} className="text-foreground" />}
+        </button>
+        <button
+          onClick={signOut}
+          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          aria-label="Sign out"
+        >
+          <LogOut size={20} className="text-foreground" />
+        </button>
+      </div>
+
       {/* Landing Hero */}
       <section className="gradient-bg flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <motion.div
