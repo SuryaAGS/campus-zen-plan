@@ -22,8 +22,9 @@ const Index = () => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("High");
-  const [category, setCategory] = useState<Category>("Assignment");
-  const [filterCategory, setFilterCategory] = useState<Category | "All">("All");
+  const [category, setCategory] = useState<string>("Assignment");
+  const [filterCategory, setFilterCategory] = useState<string>("All");
+  const { allCategoryNames } = useCategories();
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
