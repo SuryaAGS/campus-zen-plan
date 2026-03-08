@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
-import { Task, CATEGORIES, Category } from "@/types/task";
+import { Task, Category } from "@/types/task";
+import { useCategories } from "@/hooks/useCategories";
 import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,8 +22,9 @@ const Index = () => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("High");
-  const [category, setCategory] = useState<Category>("Assignment");
-  const [filterCategory, setFilterCategory] = useState<Category | "All">("All");
+  const [category, setCategory] = useState<string>("Assignment");
+  const [filterCategory, setFilterCategory] = useState<string>("All");
+  const { allCategoryNames } = useCategories();
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
@@ -247,8 +249,8 @@ const Index = () => {
               </div>
               <div className="min-w-[130px]">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-                  {CATEGORIES.map((c) => (
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                  {allCategoryNames.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
@@ -262,7 +264,7 @@ const Index = () => {
           {/* Filter Bar */}
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Filter size={16} className="text-primary-foreground/70" />
-            {(["All", ...CATEGORIES] as const).map((c) => (
+            {["All", ...allCategoryNames].map((c) => (
               <button
                 key={c}
                 onClick={() => setFilterCategory(c)}
@@ -275,6 +277,13 @@ const Index = () => {
                 {c}
               </button>
             ))}
+            <button
+              onClick={() => navigate("/categories")}
+              className="rounded-full bg-primary-foreground/10 p-1.5 text-primary-foreground/70 transition-all hover:bg-primary-foreground/20"
+              aria-label="Manage categories"
+            >
+              <Settings size={14} />
+            </button>
           </div>
 
           {/* Tasks */}
