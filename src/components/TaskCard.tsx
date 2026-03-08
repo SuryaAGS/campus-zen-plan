@@ -48,8 +48,18 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
             <button
               onClick={() => onComplete(task.id)}
               className="rounded-md bg-accent p-2 text-accent-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+              title="Mark complete"
             >
               <Check size={16} />
+            </button>
+          )}
+          {task.completed && onUncomplete && (
+            <button
+              onClick={() => onUncomplete(task.id)}
+              className="rounded-md bg-accent p-2 text-accent-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+              title="Mark as pending"
+            >
+              <Undo2 size={16} />
             </button>
           )}
           <button
