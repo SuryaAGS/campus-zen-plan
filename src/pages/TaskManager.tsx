@@ -116,6 +116,9 @@ const TaskManager = () => {
 
   useEffect(() => {
     fetchTasks();
+    // Re-check every 60 seconds for newly missed tasks
+    const interval = setInterval(fetchTasks, 60000);
+    return () => clearInterval(interval);
   }, [fetchTasks]);
 
   const addTask = async () => {
