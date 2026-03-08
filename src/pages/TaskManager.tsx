@@ -61,23 +61,51 @@ const TaskManager = () => {
         completed: !!t.completed,
       }));
 
-      // Auto-reschedule overdue tasks
-      const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
+      // Auto-reschedule overdue tasks (time-aware: 3 hours ahead)
+      const now = new Date();
+      const overdue = mapped.filter((t) => {
+        if (t.completed) return false;
+        const taskDateTime = new Date(`${t.date}T${t.time || "00:00"}`);
+        return taskDateTime < now;
+      });
+
       if (overdue.length > 0) {
+        const rescheduleTime = new Date();
+        rescheduleTime.setHours(rescheduleTime.getHours() + 3);
+        const newDate = rescheduleTime.toISOString().split("T")[0];
+        const newTime = rescheduleTime.toTimeString().slice(0, 5);
+
         const taskNames = overdue.slice(0, 3).map((t) => `"${t.title}"`).join(", ");
         const extra = overdue.length > 3 ? ` and ${overdue.length - 3} more` : "";
+
         for (const task of overdue) {
-          task.date = tomorrowStr;
+          task.date = newDate;
+          task.time = newTime;
         }
-        supabase
-          .from("tasks")
-          .update({ date: tomorrowStr })
-          .in("id", overdue.map((t) => t.id))
-          .then(() => {});
-        toast.info(`🔄 ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""} rescheduled`, {
+
+        // Batch update in DB
+        Promise.all(
+          overdue.map((t) =>
+            supabase.from("tasks").update({ date: newDate, time: newTime }).eq("id", t.id)
+          )
+        );
+
+        toast.info(`🔄 ${overdue.length} missed task${overdue.length > 1 ? "s" : ""} rescheduled to ${newTime}`, {
           description: `${taskNames}${extra}`,
           duration: 6000,
         });
+
+        // Browser push notification
+        if (Notification.permission === "granted") {
+          overdue.forEach((t) => {
+            new Notification("Task Rescheduled", {
+              body: `"${t.title}" moved to ${newTime}`,
+              icon: "/pwa-192x192.png",
+            });
+          });
+        } else if (Notification.permission !== "denied") {
+          Notification.requestPermission();
+        }
       }
 
       setTasks(mapped);
@@ -88,6 +116,9 @@ const TaskManager = () => {
 
   useEffect(() => {
     fetchTasks();
+    // Re-check every 60 seconds for newly missed tasks
+    const interval = setInterval(fetchTasks, 60000);
+    return () => clearInterval(interval);
   }, [fetchTasks]);
 
   const addTask = async () => {
