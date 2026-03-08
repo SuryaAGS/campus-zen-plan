@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
@@ -199,6 +199,13 @@ const Index = () => {
 
       {/* Controls - Right */}
       <div className="fixed right-4 top-4 z-50 flex items-center gap-2">
+        <button
+          onClick={() => navigate("/calendar")}
+          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          aria-label="Calendar view"
+        >
+          <CalendarDays size={20} className="text-foreground" />
+        </button>
         <button
           onClick={() => setDark((d) => !d)}
           className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
