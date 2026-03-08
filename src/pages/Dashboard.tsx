@@ -99,8 +99,8 @@ const Dashboard = () => {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split("T")[0];
-      const dayTasks = (data || []).filter((t: any) => t.date === dateStr);
-      const dayCompleted = dayTasks.filter((t: any) => t.completed);
+      const dayTasks = rawTasks.filter((t) => t.date === dateStr);
+      const dayCompleted = dayTasks.filter((t) => t.completed);
       days.push({
         day: i === 0 ? "Today" : dayNames[d.getDay()],
         date: dateStr,
@@ -109,7 +109,7 @@ const Dashboard = () => {
       });
     }
     return days;
-  }, [data]);
+  }, [rawTasks]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
