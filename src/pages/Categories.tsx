@@ -4,6 +4,7 @@ import { ArrowLeft, Plus, Trash2, Tag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useCategories } from "@/hooks/useCategories";
 import { CATEGORIES } from "@/types/task";
+import { getCategoryColor } from "@/lib/categoryColors";
 
 const Categories = () => {
   const navigate = useNavigate();
