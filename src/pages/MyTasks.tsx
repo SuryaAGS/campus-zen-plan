@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
   ArrowLeft, Filter, Settings, ArrowUpDown, Search,
-  Plus, ListTodo, CheckCircle2
+  Plus, ListTodo, CheckCircle2, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Task, Category } from "@/types/task";
