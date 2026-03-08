@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, GraduationCap, ArrowDown } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter } from "lucide-react";
 import mascot from "@/assets/mascot.png";
-import { Task } from "@/types/task";
+import { Task, CATEGORIES, Category } from "@/types/task";
 import { loadTasks, saveTasks, getAiSuggestion, autoReschedule, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
 import TaskCard from "@/components/TaskCard";
 import ProgressBar from "@/components/ProgressBar";
@@ -14,6 +14,8 @@ const Index = () => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("High");
+  const [category, setCategory] = useState<Category>("Assignment");
+  const [filterCategory, setFilterCategory] = useState<Category | "All">("All");
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const appRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +38,7 @@ const Index = () => {
       title,
       date,
       priority,
+      category,
       completed: false,
     };
     persist([...tasks, newTask]);
@@ -49,8 +52,9 @@ const Index = () => {
   };
   const deleteTask = (id: string) => persist(tasks.filter((t) => t.id !== id));
 
-  const pending = tasks.filter((t) => !t.completed);
-  const completed = tasks.filter((t) => t.completed);
+  const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
+  const pending = filtered.filter((t) => !t.completed);
+  const completed = filtered.filter((t) => t.completed);
 
   const scrollToApp = () => {
     appRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -117,11 +121,37 @@ const Index = () => {
                   <option value="Low">🟢 Low</option>
                 </select>
               </div>
+              <div className="min-w-[130px]">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
+                <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
               <button onClick={addTask} className="gradient-bg flex items-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110">
                 <Plus size={16} /> Add
               </button>
             </div>
           </motion.div>
+
+          {/* Filter Bar */}
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <Filter size={16} className="text-primary-foreground/70" />
+            {(["All", ...CATEGORIES] as const).map((c) => (
+              <button
+                key={c}
+                onClick={() => setFilterCategory(c)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                  filterCategory === c
+                    ? "bg-card text-foreground shadow-card"
+                    : "bg-primary-foreground/10 text-primary-foreground/80 hover:bg-primary-foreground/20"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
 
           {/* Tasks */}
           <div className="mb-6 space-y-3">

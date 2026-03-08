@@ -15,6 +15,22 @@ const priorityStyles = {
   Low: "border-l-emerald-500 text-emerald-600",
 };
 
+const categoryColors: Record<string, string> = {
+  Exam: "bg-red-100 text-red-700",
+  Assignment: "bg-blue-100 text-blue-700",
+  Project: "bg-purple-100 text-purple-700",
+  Study: "bg-teal-100 text-teal-700",
+  Other: "bg-gray-100 text-gray-600",
+};
+
+const categoryEmojis: Record<string, string> = {
+  Exam: "📝",
+  Assignment: "📚",
+  Project: "🔧",
+  Study: "📖",
+  Other: "📌",
+};
+
 export default function TaskCard({ task, index, onComplete, onDelete }: TaskCardProps) {
   return (
     <motion.div
@@ -28,9 +44,12 @@ export default function TaskCard({ task, index, onComplete, onDelete }: TaskCard
         <span className={`font-display font-semibold text-card-foreground ${task.completed ? "line-through opacity-50" : ""}`}>
           {task.title}
         </span>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
           <span className={`font-medium ${priorityStyles[task.priority].split(" ")[1]}`}>
             {task.priority}
+          </span>
+          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${categoryColors[task.category] || categoryColors.Other}`}>
+            {categoryEmojis[task.category] || "📌"} {task.category}
           </span>
           <span className="text-muted-foreground">{task.date}</span>
         </div>

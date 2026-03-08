@@ -7,6 +7,7 @@ const makeTask = (date: string, completed = false): Task => ({
   title: "Test task",
   date,
   priority: "High",
+  category: "Assignment",
   completed,
 });
 
