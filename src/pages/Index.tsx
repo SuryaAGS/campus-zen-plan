@@ -221,17 +221,17 @@ const Index = () => {
         </button>
         <button
           onClick={() => setDark((d) => !d)}
-          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
           aria-label="Toggle dark mode"
         >
-          {dark ? <Sun size={20} className="text-foreground" /> : <Moon size={20} className="text-foreground" />}
+          {dark ? <Sun size={18} className="text-foreground sm:size-5" /> : <Moon size={18} className="text-foreground sm:size-5" />}
         </button>
         <button
           onClick={signOut}
-          className="rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
           aria-label="Sign out"
         >
-          <LogOut size={20} className="text-foreground" />
+          <LogOut size={18} className="text-foreground sm:size-5" />
         </button>
       </div>
 
