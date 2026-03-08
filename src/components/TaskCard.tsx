@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Trash2, Undo2 } from "lucide-react";
 import { Task } from "@/types/task";
 import { getCategoryColor, getCategoryEmoji } from "@/lib/categoryColors";
 
