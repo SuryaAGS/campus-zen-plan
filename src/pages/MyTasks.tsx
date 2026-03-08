@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
   ArrowLeft, Filter, Settings, ArrowUpDown, Search,
-  Plus, ListTodo, CheckCircle2
+  Plus, ListTodo, CheckCircle2, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Task, Category } from "@/types/task";
@@ -27,6 +27,45 @@ const MyTasks = () => {
   const [sortBy, setSortBy] = useState<"date" | "priority" | "category">("date");
   const [searchQuery, setSearchQuery] = useState("");
   const { allCategoryNames } = useCategories();
+
+  // Quick-add FAB state
+  const [fabOpen, setFabOpen] = useState(false);
+  const [qTitle, setQTitle] = useState("");
+  const [qDate, setQDate] = useState("");
+  const [qTime, setQTime] = useState("");
+  const [qPriority, setQPriority] = useState<Task["priority"]>("High");
+  const [qCategory, setQCategory] = useState<string>("Assignment");
+  const [qAdding, setQAdding] = useState(false);
+
+  const quickAdd = async () => {
+    if (!qTitle || !qDate || !user) {
+      if (!qTitle) toast.error("Enter a task title");
+      else if (!qDate) toast.error("Select a due date");
+      return;
+    }
+    setQAdding(true);
+    try {
+      const { error } = await supabase.from("tasks").insert({
+        user_id: user.id,
+        title: qTitle,
+        date: qDate,
+        time: qTime || null,
+        priority: qPriority,
+        category: qCategory,
+      } as any);
+      if (error) { toast.error("Failed to add task"); return; }
+      toast.success("✅ Task added!");
+      setQTitle("");
+      setQDate("");
+      setQTime("");
+      setFabOpen(false);
+      fetchTasks();
+    } catch {
+      toast.error("Failed to add task");
+    } finally {
+      setQAdding(false);
+    }
+  };
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -386,6 +425,98 @@ const MyTasks = () => {
           </motion.div>
         )}
       </div>
+
+      {/* FAB + Quick Add Panel */}
+      <AnimatePresence>
+        {fabOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-foreground/20 backdrop-blur-sm"
+              onClick={() => setFabOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 80, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 80, scale: 0.9 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed bottom-24 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl bg-card p-5 shadow-elevated"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="font-display text-base font-semibold text-foreground">Quick Add</h3>
+                <button onClick={() => setFabOpen(false)} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <input
+                  value={qTitle}
+                  onChange={(e) => setQTitle(e.target.value)}
+                  placeholder="Task title..."
+                  autoFocus
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  onKeyDown={(e) => e.key === "Enter" && quickAdd()}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="date"
+                    value={qDate}
+                    onChange={(e) => setQDate(e.target.value)}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                  <input
+                    type="time"
+                    value={qTime}
+                    onChange={(e) => setQTime(e.target.value)}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={qPriority}
+                    onChange={(e) => setQPriority(e.target.value as Task["priority"])}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="High">🔴 High</option>
+                    <option value="Medium">🟡 Medium</option>
+                    <option value="Low">🟢 Low</option>
+                  </select>
+                  <select
+                    value={qCategory}
+                    onChange={(e) => setQCategory(e.target.value)}
+                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    {allCategoryNames.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={quickAdd}
+                  disabled={qAdding}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-110 disabled:opacity-50"
+                >
+                  <Plus size={16} />
+                  {qAdding ? "Adding..." : "Add Task"}
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <motion.button
+        onClick={() => setFabOpen((o) => !o)}
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-elevated transition-all hover:scale-110"
+        whileTap={{ scale: 0.9 }}
+        aria-label="Quick add task"
+      >
+        <motion.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+          <Plus size={28} />
+        </motion.div>
+      </motion.button>
     </div>
   );
 };
