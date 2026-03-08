@@ -330,7 +330,7 @@ const Index = () => {
             <AnimatePresence>
               {pending.length === 0 && <p className="text-sm text-primary-foreground/60">No pending tasks. Add one above!</p>}
               {pending.map((task, i) => (
-                <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
+                <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onEdit={editTask} onDelete={deleteTask} allCategories={allCategoryNames} />
               ))}
             </AnimatePresence>
           </div>
