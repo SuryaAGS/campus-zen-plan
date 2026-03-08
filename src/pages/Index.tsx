@@ -243,30 +243,32 @@ const Index = () => {
           transition={{ duration: 0.6 }}
           className="max-w-2xl"
         >
-          <div className="mb-6 flex items-center justify-center gap-3">
-            <GraduationCap size={48} className="text-primary-foreground" />
-            <h1 className="font-display text-5xl font-bold text-primary-foreground md:text-6xl">
+          <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <GraduationCap size={36} className="text-primary-foreground sm:size-12" />
+            <h1 className="font-display text-3xl font-bold text-primary-foreground sm:text-5xl md:text-6xl">
               CollegeMate AI Planner
             </h1>
           </div>
-          <p className="mx-auto mb-8 max-w-lg text-lg text-primary-foreground/80 md:text-xl">
+          <p className="mx-auto mb-6 max-w-lg text-base text-primary-foreground/80 sm:mb-8 md:text-xl">
             The smart AI-powered planner that automatically organizes your tasks,
             reschedules missed work, and boosts your productivity.
           </p>
-          <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-10 h-44 w-44 drop-shadow-2xl md:h-52 md:w-52" />
-          <button
-            onClick={scrollToApp}
-            className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3 text-lg font-semibold text-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card"
-          >
-            Start Planning
-            <ArrowDown size={20} />
-          </button>
-          <button
-            onClick={() => navigate("/install")}
-            className="ml-3 inline-flex items-center gap-2 rounded-full bg-primary-foreground/20 px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-105 hover:bg-primary-foreground/30"
-          >
-            <Download size={16} /> Install App
-          </button>
+          <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-8 h-32 w-32 drop-shadow-2xl sm:mb-10 sm:h-44 sm:w-44 md:h-52 md:w-52" />
+          <div className="flex flex-col items-center gap-3 sm:flex-row">
+            <button
+              onClick={scrollToApp}
+              className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3 text-base font-semibold text-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card sm:text-lg"
+            >
+              Start Planning
+              <ArrowDown size={20} />
+            </button>
+            <button
+              onClick={() => navigate("/install")}
+              className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/20 px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-105 hover:bg-primary-foreground/30"
+            >
+              <Download size={16} /> Install App
+            </button>
+          </div>
         </motion.div>
       </section>
 
