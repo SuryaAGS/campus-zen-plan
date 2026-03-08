@@ -1,0 +1,1 @@
+ALTER TABLE public.tasks ADD COLUMN missed_count integer NOT NULL DEFAULT 0;

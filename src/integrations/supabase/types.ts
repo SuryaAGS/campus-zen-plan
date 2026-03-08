@@ -72,6 +72,7 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          missed_count: number
           priority: string
           time: string | null
           title: string
@@ -84,6 +85,7 @@ export type Database = {
           created_at?: string
           date: string
           id?: string
+          missed_count?: number
           priority: string
           time?: string | null
           title: string
@@ -96,6 +98,7 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          missed_count?: number
           priority?: string
           time?: string | null
           title?: string
