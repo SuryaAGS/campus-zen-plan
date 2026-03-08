@@ -44,7 +44,8 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<ProtectedRoute><PageTransition><Index /></PageTransition></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><PageTransition><Dashboard /></PageTransition></ProtectedRoute>} />
-        <Route path="/tasks" element={<ProtectedRoute><PageTransition><TaskManager /></PageTransition></ProtectedRoute>} />
+        <Route path="/tasks" element={<ProtectedRoute><PageTransition><AddTask /></PageTransition></ProtectedRoute>} />
+        <Route path="/my-tasks" element={<ProtectedRoute><PageTransition><MyTasks /></PageTransition></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><PageTransition><Profile /></PageTransition></ProtectedRoute>} />
         <Route path="/categories" element={<ProtectedRoute><PageTransition><Categories /></PageTransition></ProtectedRoute>} />
         <Route path="/calendar" element={<ProtectedRoute><PageTransition><CalendarView /></PageTransition></ProtectedRoute>} />
