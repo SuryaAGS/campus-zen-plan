@@ -99,7 +99,7 @@ const TaskManager = () => {
               date: newDate,
               time: newTime,
               missed_count: newMissedCount,
-            } as any).eq("id", task.id)
+            } as any).eq("id", task.id).then(() => {})
           );
         }
 
