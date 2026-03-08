@@ -29,6 +29,7 @@ export const languages: Record<Language, { label: string; native: string; flag: 
   ar: { label: "Arabic", native: "العربية", flag: "🇸🇦" },
   hi: { label: "Hindi", native: "हिन्दी", flag: "🇮🇳" },
   ko: { label: "Korean", native: "한국어", flag: "🇰🇷" },
+  te: { label: "Telugu", native: "తెలుగు", flag: "🇮🇳" },
 };
 
 export const accentColors: Record<AccentColor, { label: string; hsl: string; preview: string }> = {
