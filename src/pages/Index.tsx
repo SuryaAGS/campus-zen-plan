@@ -171,7 +171,8 @@ const Index = () => {
   };
 
   const reminders = useTaskReminders(tasks);
-  const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
+  const filtered = (filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory))
+    .filter((t) => !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const priorityOrder: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
   const sortTasks = (list: Task[]) => {
