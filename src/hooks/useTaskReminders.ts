@@ -16,6 +16,25 @@ function getTasksDueSoon(tasks: Task[]) {
   return { dueToday, dueTomorrow };
 }
 
+function getTasksDueSoonByTime(tasks: Task[]) {
+  const now = new Date();
+  const nowMs = now.getTime();
+  const FIFTEEN_MIN = 15 * 60 * 1000;
+
+  const dueSoon: Task[] = [];
+  for (const t of tasks) {
+    if (t.completed || !t.time || !t.date) continue;
+    const taskDateTime = new Date(`${t.date}T${t.time}`);
+    if (isNaN(taskDateTime.getTime())) continue;
+    const diff = taskDateTime.getTime() - nowMs;
+    // Notify if task is within 15 min from now (and not more than 1 min past)
+    if (diff <= FIFTEEN_MIN && diff >= -60_000) {
+      dueSoon.push(t);
+    }
+  }
+  return dueSoon;
+}
+
 function requestNotificationPermission() {
   if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
