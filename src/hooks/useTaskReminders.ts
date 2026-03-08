@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { Task } from "@/types/task";
 import { toast } from "sonner";
+import { getNotificationSettings } from "@/lib/notificationSettings";
 
 function getTasksDueSoon(tasks: Task[]) {
   const now = new Date();
@@ -24,12 +25,10 @@ function requestNotificationPermission() {
 async function sendBrowserNotification(title: string, body: string) {
   try {
     if (!("Notification" in window) || Notification.permission !== "granted") return;
-    // Use ServiceWorker notification for PWA/mobile compatibility
     const reg = await navigator.serviceWorker?.ready;
     if (reg) {
       reg.showNotification(title, { body, icon: "/favicon.ico" });
     } else {
-      // Fallback for desktop browsers
       new Notification(title, { body, icon: "/favicon.ico" });
     }
   } catch {
@@ -43,22 +42,23 @@ export function useTaskReminders(tasks: Task[]) {
   const checkReminders = useCallback(() => {
     if (tasks.length === 0 || hasNotified.current) return;
 
+    const settings = getNotificationSettings();
     const { dueToday, dueTomorrow } = getTasksDueSoon(tasks);
 
-    if (dueToday.length > 0) {
+    if (dueToday.length > 0 && settings.enableDueToday) {
       const msg = dueToday.length === 1
         ? `"${dueToday[0].title}" is due today!`
         : `${dueToday.length} tasks are due today!`;
-      toast.warning(msg, { duration: 8000 });
-      sendBrowserNotification("⚠️ Due Today", msg);
+      if (settings.enableToastReminders) toast.warning(msg, { duration: 8000 });
+      if (settings.enablePushNotifications) sendBrowserNotification("⚠️ Due Today", msg);
     }
 
-    if (dueTomorrow.length > 0) {
+    if (dueTomorrow.length > 0 && settings.enableDueTomorrow) {
       const msg = dueTomorrow.length === 1
         ? `"${dueTomorrow[0].title}" is due tomorrow`
         : `${dueTomorrow.length} tasks are due tomorrow`;
-      toast.info(msg, { duration: 6000 });
-      sendBrowserNotification("📅 Due Tomorrow", msg);
+      if (settings.enableToastReminders) toast.info(msg, { duration: 6000 });
+      if (settings.enablePushNotifications) sendBrowserNotification("📅 Due Tomorrow", msg);
     }
 
     if (dueToday.length > 0 || dueTomorrow.length > 0) {
@@ -66,22 +66,22 @@ export function useTaskReminders(tasks: Task[]) {
     }
   }, [tasks]);
 
-  // Request permission on mount
   useEffect(() => {
-    requestNotificationPermission();
+    const settings = getNotificationSettings();
+    if (settings.enablePushNotifications) requestNotificationPermission();
   }, []);
 
-  // Check reminders when tasks load
   useEffect(() => {
     checkReminders();
   }, [checkReminders]);
 
-  // Re-check every 30 minutes
   useEffect(() => {
+    const settings = getNotificationSettings();
+    if (settings.reminderIntervalMinutes === 0) return;
     const interval = setInterval(() => {
       hasNotified.current = false;
       checkReminders();
-    }, 30 * 60 * 1000);
+    }, settings.reminderIntervalMinutes * 60 * 1000);
     return () => clearInterval(interval);
   }, [checkReminders]);
 
