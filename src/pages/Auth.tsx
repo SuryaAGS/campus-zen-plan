@@ -148,13 +148,21 @@ export default function Auth() {
         </button>
 
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="font-medium text-primary hover:underline"
-          >
-            {isLogin ? "Sign Up" : "Sign In"}
-          </button>
+          {isForgot ? (
+            <button onClick={() => setMode("login")} className="font-medium text-primary hover:underline">
+              Back to Sign In
+            </button>
+          ) : (
+            <>
+              {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+              <button
+                onClick={() => setMode(isLogin ? "signup" : "login")}
+                className="font-medium text-primary hover:underline"
+              >
+                {isLogin ? "Sign Up" : "Sign In"}
+              </button>
+            </>
+          )}
         </p>
       </motion.div>
     </div>
