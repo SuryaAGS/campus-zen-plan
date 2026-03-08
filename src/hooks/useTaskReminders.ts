@@ -144,21 +144,27 @@ export function useTaskReminders(tasks: Task[]) {
     const settings = getNotificationSettings();
     if (!settings.enableDueToday) return;
 
-    const dueSoon = getTasksDueSoonByTime(currentTasks);
-    const alreadyNotified = getTimeNotifiedIds();
-    const newDueSoon = dueSoon.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
+    const { dueNow, dueFiveMin } = getTasksDueSoonByTime(currentTasks);
 
-    if (newDueSoon.length === 0) return;
-
-    for (const task of newDueSoon) {
-      const msg = `"${task.title}" is due at ${task.time}!`;
-      if (settings.enableToastReminders) {
-        showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
-      }
-      if (settings.enablePushNotifications) sendBrowserNotification("⏰ Coming Up Soon", msg);
+    // 5-minute warning
+    const already5min = getTimeNotifiedIds(TIME_5MIN_NOTIFIED_KEY);
+    const new5min = dueFiveMin.filter((t) => !already5min.has(t.id) && !isSnoozed(`toast-time-5min-${t.id}`));
+    for (const task of new5min) {
+      const msg = `"${task.title}" starts at ${task.time} — 5 minutes!`;
+      if (settings.enableToastReminders) showSnoozeableToast("info", `⏳ ${msg}`, `toast-time-5min-${task.id}`);
+      if (settings.enablePushNotifications) sendBrowserNotification("⏳ 5 Minutes Left", msg);
     }
+    if (new5min.length > 0) markTimeNotified(new5min.map((t) => t.id), TIME_5MIN_NOTIFIED_KEY);
 
-    markTimeNotified(newDueSoon.map((t) => t.id));
+    // Exact time notification
+    const alreadyNotified = getTimeNotifiedIds(TIME_NOTIFIED_KEY);
+    const newDueNow = dueNow.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
+    for (const task of newDueNow) {
+      const msg = `"${task.title}" is due NOW!`;
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
+      if (settings.enablePushNotifications) sendBrowserNotification("⏰ Task Due Now", msg);
+    }
+    if (newDueNow.length > 0) markTimeNotified(newDueNow.map((t) => t.id), TIME_NOTIFIED_KEY);
   }, []);
 
   useEffect(() => {
