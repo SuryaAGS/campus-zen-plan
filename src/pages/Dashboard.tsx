@@ -8,11 +8,10 @@ import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
-import { refreshStreak, StreakData, getAiSuggestion } from "@/lib/tasks";
+import { refreshStreak, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import StreakBadge from "@/components/StreakBadge";
-import AiSuggestion from "@/components/AiSuggestion";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
