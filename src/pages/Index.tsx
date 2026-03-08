@@ -288,6 +288,9 @@ const Index = () => {
             </button>
           </div>
 
+          {/* Reminders */}
+          <TaskReminders dueToday={reminders.dueToday} dueTomorrow={reminders.dueTomorrow} />
+
           {/* Tasks */}
           <div className="mb-6 space-y-3">
             <h2 className="font-display text-lg font-semibold text-primary-foreground">📌 Tasks ({pending.length})</h2>
