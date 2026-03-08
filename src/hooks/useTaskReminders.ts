@@ -38,12 +38,17 @@ async function sendBrowserNotification(title: string, body: string) {
 
 export function useTaskReminders(tasks: Task[]) {
   const hasNotified = useRef(false);
+  const tasksRef = useRef<Task[]>([]);
+  
+  // Keep tasks ref in sync without triggering effects
+  tasksRef.current = tasks;
 
   const checkReminders = useCallback(() => {
-    if (tasks.length === 0 || hasNotified.current) return;
+    const currentTasks = tasksRef.current;
+    if (currentTasks.length === 0 || hasNotified.current) return;
 
     const settings = getNotificationSettings();
-    const { dueToday, dueTomorrow } = getTasksDueSoon(tasks);
+    const { dueToday, dueTomorrow } = getTasksDueSoon(currentTasks);
 
     if (dueToday.length > 0 && settings.enableDueToday) {
       const msg = dueToday.length === 1
@@ -64,16 +69,19 @@ export function useTaskReminders(tasks: Task[]) {
     if (dueToday.length > 0 || dueTomorrow.length > 0) {
       hasNotified.current = true;
     }
-  }, [tasks]);
+  }, []);
 
   useEffect(() => {
     const settings = getNotificationSettings();
     if (settings.enablePushNotifications) requestNotificationPermission();
   }, []);
 
+  // Only run once when tasks first load
   useEffect(() => {
-    checkReminders();
-  }, [checkReminders]);
+    if (tasks.length > 0 && !hasNotified.current) {
+      checkReminders();
+    }
+  }, [tasks.length > 0, checkReminders]);
 
   useEffect(() => {
     const settings = getNotificationSettings();
