@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Categories from "./pages/Categories";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
