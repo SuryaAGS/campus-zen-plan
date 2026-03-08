@@ -158,6 +158,16 @@ const Index = () => {
     fetchTasks();
   };
 
+  const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => {
+    const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
+    if (error) {
+      toast.error("Failed to update task");
+      return;
+    }
+    toast.success("Task updated");
+    fetchTasks();
+  };
+
   const reminders = useTaskReminders(tasks);
   const filtered = filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory);
   const pending = filtered.filter((t) => !t.completed);
