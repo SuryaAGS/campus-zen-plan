@@ -8,6 +8,7 @@ interface TaskCardProps {
   task: Task;
   index: number;
   onComplete: (id: string) => void;
+  onUncomplete?: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
