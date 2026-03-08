@@ -249,8 +249,8 @@ const Index = () => {
               </div>
               <div className="min-w-[130px]">
                 <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value as Category)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-                  {CATEGORIES.map((c) => (
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                  {allCategoryNames.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
