@@ -136,6 +136,15 @@ const Index = () => {
     fetchTasks();
   };
 
+  const uncompleteTask = async (id: string) => {
+    const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
+    if (error) {
+      toast.error("Failed to undo completion");
+      return;
+    }
+    fetchTasks();
+  };
+
   const deleteTask = async (id: string) => {
     const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (error) {
@@ -314,7 +323,7 @@ const Index = () => {
               <h2 className="font-display text-lg font-semibold text-primary-foreground">✅ Completed ({completed.length})</h2>
               <AnimatePresence>
                 {completed.map((task, i) => (
-                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
+                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onUncomplete={uncompleteTask} onDelete={deleteTask} />
                 ))}
               </AnimatePresence>
             </div>
