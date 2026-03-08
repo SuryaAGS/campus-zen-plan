@@ -42,15 +42,14 @@ const Index = () => {
       return;
     }
 
-    // Auto-reschedule overdue tasks
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-    const updates: Promise<unknown>[] = [];
-    const mapped = (data || []).map((t) => {
+    const mapped: Task[] = [];
+    for (const t of data || []) {
       const task: Task = {
         id: t.id,
         title: t.title,
@@ -61,14 +60,11 @@ const Index = () => {
       };
       if (!task.completed && new Date(task.date) < today) {
         task.date = tomorrowStr;
-        updates.push(
-          supabase.from("tasks").update({ date: tomorrowStr }).eq("id", task.id).then()
-        );
+        await supabase.from("tasks").update({ date: tomorrowStr }).eq("id", task.id);
       }
-      return task;
-    });
+      mapped.push(task);
+    }
 
-    await Promise.all(updates);
     setTasks(mapped);
     setStreak(refreshStreak());
   }, []);
