@@ -58,7 +58,7 @@ const Dashboard = () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-    const mapped: Task[] = (data || []).map((t) => ({
+    const mapped = (data || []).map((t) => ({
       id: t.id,
       title: t.title,
       date: t.date || tomorrowStr,
@@ -66,14 +66,16 @@ const Dashboard = () => {
       priority: (t.priority as Task["priority"]) || "Medium",
       category: (t.category as Category) || "Other",
       completed: !!t.completed,
+      missedCount: (t as any).missed_count ?? 0,
     }));
-    setTasks(mapped);
+
+    setRescheduledTasks(mapped.filter((t) => !t.completed && t.missedCount > 0));
+    const taskState: Task[] = mapped.map(({ missedCount, ...rest }) => rest);
+    setTasks(taskState);
     setStreak(refreshStreak());
   }, []);
 
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  const [rescheduledTasks, setRescheduledTasks] = useState<Array<{ id: string; title: string; date: string; time: string | null; missedCount: number }>>([]);
 
   const pending = tasks.filter((t) => !t.completed);
   const completed = tasks.filter((t) => t.completed);
