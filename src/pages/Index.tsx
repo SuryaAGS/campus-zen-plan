@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
+import { getCategoryColor } from "@/lib/categoryColors";
 import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
