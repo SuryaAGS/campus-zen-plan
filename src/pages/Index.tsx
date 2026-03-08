@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, GraduationCap } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown } from "lucide-react";
 import mascot from "@/assets/mascot.png";
 import { Task } from "@/types/task";
 import { loadTasks, saveTasks, getAiSuggestion, autoReschedule } from "@/lib/tasks";
@@ -13,6 +13,7 @@ const Index = () => {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [priority, setPriority] = useState<Task["priority"]>("High");
+  const appRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loaded = autoReschedule(loadTasks());
@@ -45,109 +46,152 @@ const Index = () => {
   const pending = tasks.filter((t) => !t.completed);
   const completed = tasks.filter((t) => t.completed);
 
+  const scrollToApp = () => {
+    appRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <div className="min-h-screen gradient-bg">
-      <div className="container mx-auto max-w-3xl px-4 py-8">
-        {/* Header */}
+    <div className="min-h-screen">
+      {/* Landing Hero */}
+      <section className="gradient-bg flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 text-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-2xl"
         >
-          <div className="mb-4 flex items-center justify-center gap-3">
-            <GraduationCap size={36} className="text-primary-foreground" />
-            <h1 className="font-display text-4xl font-bold text-primary-foreground">
-              CollegeMate
+          <div className="mb-6 flex items-center justify-center gap-3">
+            <GraduationCap size={48} className="text-primary-foreground" />
+            <h1 className="font-display text-5xl font-bold text-primary-foreground md:text-6xl">
+              CollegeMate AI Planner
             </h1>
           </div>
-          <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-3 h-32 w-32 drop-shadow-lg" />
-          <p className="text-lg text-primary-foreground/80">
-            Smart AI-powered student productivity
+
+          <p className="mx-auto mb-8 max-w-lg text-lg text-primary-foreground/80 md:text-xl">
+            The smart AI-powered planner that automatically organizes your tasks,
+            reschedules missed work, and boosts your productivity.
           </p>
-        </motion.div>
 
-        {/* Add Task Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-6 rounded-xl bg-card p-5 shadow-elevated"
-        >
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex-1 min-w-[180px]">
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Task</label>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Study for midterms"
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                onKeyDown={(e) => e.key === "Enter" && addTask()}
-              />
+          <img
+            src={mascot}
+            alt="CollegeMate mascot"
+            className="mx-auto mb-10 h-44 w-44 drop-shadow-2xl md:h-52 md:w-52"
+          />
+
+          <button
+            onClick={scrollToApp}
+            className="inline-flex items-center gap-2 rounded-full bg-card px-8 py-3 text-lg font-semibold text-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card"
+          >
+            Start Planning
+            <ArrowDown size={20} />
+          </button>
+        </motion.div>
+      </section>
+
+      {/* App Section */}
+      <div ref={appRef} className="gradient-bg min-h-screen">
+        <div className="container mx-auto max-w-3xl px-4 py-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8 text-center"
+          >
+            <div className="mb-4 flex items-center justify-center gap-3">
+              <GraduationCap size={36} className="text-primary-foreground" />
+              <h2 className="font-display text-4xl font-bold text-primary-foreground">
+                CollegeMate
+              </h2>
             </div>
-            <div className="min-w-[150px]">
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Due Date</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
-            <div className="min-w-[110px]">
-              <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as Task["priority"])}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            <p className="text-lg text-primary-foreground/80">
+              Smart AI-powered student productivity
+            </p>
+          </motion.div>
+
+          {/* Add Task Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6 rounded-xl bg-card p-5 shadow-elevated"
+          >
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex-1 min-w-[180px]">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Task</label>
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Study for midterms"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  onKeyDown={(e) => e.key === "Enter" && addTask()}
+                />
+              </div>
+              <div className="min-w-[150px]">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Due Date</label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <div className="min-w-[110px]">
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value as Task["priority"])}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="High">🔴 High</option>
+                  <option value="Medium">🟡 Medium</option>
+                  <option value="Low">🟢 Low</option>
+                </select>
+              </div>
+              <button
+                onClick={addTask}
+                className="gradient-bg flex items-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110"
               >
-                <option value="High">🔴 High</option>
-                <option value="Medium">🟡 Medium</option>
-                <option value="Low">🟢 Low</option>
-              </select>
+                <Plus size={16} />
+                Add
+              </button>
             </div>
-            <button
-              onClick={addTask}
-              className="gradient-bg flex items-center gap-2 rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110"
-            >
-              <Plus size={16} />
-              Add
-            </button>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Tasks */}
-        <div className="mb-6 space-y-3">
-          <h2 className="font-display text-lg font-semibold text-primary-foreground">
-            📌 Tasks ({pending.length})
-          </h2>
-          <AnimatePresence>
-            {pending.length === 0 && (
-              <p className="text-sm text-primary-foreground/60">No pending tasks. Add one above!</p>
-            )}
-            {pending.map((task, i) => (
-              <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {/* Completed */}
-        {completed.length > 0 && (
+          {/* Tasks */}
           <div className="mb-6 space-y-3">
             <h2 className="font-display text-lg font-semibold text-primary-foreground">
-              ✅ Completed ({completed.length})
+              📌 Tasks ({pending.length})
             </h2>
             <AnimatePresence>
-              {completed.map((task, i) => (
+              {pending.length === 0 && (
+                <p className="text-sm text-primary-foreground/60">No pending tasks. Add one above!</p>
+              )}
+              {pending.map((task, i) => (
                 <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
               ))}
             </AnimatePresence>
           </div>
-        )}
 
-        {/* Progress & AI */}
-        <div className="space-y-4">
-          <ProgressBar completed={completed.length} total={tasks.length} />
-          <AiSuggestion tip={getAiSuggestion(tasks)} />
+          {/* Completed */}
+          {completed.length > 0 && (
+            <div className="mb-6 space-y-3">
+              <h2 className="font-display text-lg font-semibold text-primary-foreground">
+                ✅ Completed ({completed.length})
+              </h2>
+              <AnimatePresence>
+                {completed.map((task, i) => (
+                  <TaskCard key={task.id} task={task} index={i} onComplete={completeTask} onDelete={deleteTask} />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Progress & AI */}
+          <div className="space-y-4">
+            <ProgressBar completed={completed.length} total={tasks.length} />
+            <AiSuggestion tip={getAiSuggestion(tasks)} />
+          </div>
         </div>
       </div>
     </div>
