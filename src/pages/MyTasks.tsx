@@ -28,6 +28,45 @@ const MyTasks = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { allCategoryNames } = useCategories();
 
+  // Quick-add FAB state
+  const [fabOpen, setFabOpen] = useState(false);
+  const [qTitle, setQTitle] = useState("");
+  const [qDate, setQDate] = useState("");
+  const [qTime, setQTime] = useState("");
+  const [qPriority, setQPriority] = useState<Task["priority"]>("High");
+  const [qCategory, setQCategory] = useState<string>("Assignment");
+  const [qAdding, setQAdding] = useState(false);
+
+  const quickAdd = async () => {
+    if (!qTitle || !qDate || !user) {
+      if (!qTitle) toast.error("Enter a task title");
+      else if (!qDate) toast.error("Select a due date");
+      return;
+    }
+    setQAdding(true);
+    try {
+      const { error } = await supabase.from("tasks").insert({
+        user_id: user.id,
+        title: qTitle,
+        date: qDate,
+        time: qTime || null,
+        priority: qPriority,
+        category: qCategory,
+      } as any);
+      if (error) { toast.error("Failed to add task"); return; }
+      toast.success("✅ Task added!");
+      setQTitle("");
+      setQDate("");
+      setQTime("");
+      setFabOpen(false);
+      fetchTasks();
+    } catch {
+      toast.error("Failed to add task");
+    } finally {
+      setQAdding(false);
+    }
+  };
+
   const fetchTasks = useCallback(async () => {
     try {
       const { data, error } = await supabase
