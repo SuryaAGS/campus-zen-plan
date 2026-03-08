@@ -110,9 +110,10 @@ const Index = () => {
       user_id: user.id,
       title,
       date,
+      time: time || null,
       priority,
       category,
-    });
+    } as any);
     if (error) {
       toast.error("Failed to add task");
       return;
