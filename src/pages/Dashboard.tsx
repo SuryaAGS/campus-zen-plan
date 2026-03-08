@@ -278,7 +278,60 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* Streak */}
+        {/* Weekly Progress Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="mb-8"
+        >
+          <Card className="border-none shadow-elevated">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Weekly Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-52">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weeklyData} barGap={4}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={24} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                      }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                      formatter={(value: number, name: string) => [
+                        value,
+                        name === "completed" ? "Completed" : "Total",
+                      ]}
+                    />
+                    <Bar dataKey="total" fill="hsl(var(--muted-foreground) / 0.25)" radius={[4, 4, 0, 0]} name="total" />
+                    <Bar dataKey="completed" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="completed" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-muted-foreground/25" />
+                  Total
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
+                  Completed
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
