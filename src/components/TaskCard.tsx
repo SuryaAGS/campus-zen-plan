@@ -22,7 +22,7 @@ const priorityStyles = {
 };
 
 const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
-  function TaskCard({ task, index, onComplete, onUncomplete, onDelete }, ref) {
+  function TaskCard({ task, index, onComplete, onUncomplete, onEdit, onDelete, allCategories }, ref) {
     return (
       <motion.div
         ref={ref}
