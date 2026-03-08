@@ -1,6 +1,6 @@
 export type AccentColor = "indigo" | "teal" | "rose" | "amber" | "emerald" | "violet";
 export type FontSize = "small" | "medium" | "large";
-export type Language = "en" | "es" | "fr" | "de" | "pt" | "ja" | "zh" | "ar" | "hi" | "ko";
+export type Language = "en" | "es" | "fr" | "de" | "pt" | "ja" | "zh" | "ar" | "hi" | "ko" | "te";
 
 export interface ThemeSettings {
   accentColor: AccentColor;
