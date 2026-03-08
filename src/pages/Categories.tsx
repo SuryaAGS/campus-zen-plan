@@ -86,7 +86,8 @@ const Categories = () => {
                     className="flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2"
                   >
                     <span className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <Tag size={14} className="text-secondary" /> {cat.name}
+                      <span className={`inline-block h-3 w-3 rounded-full ${getCategoryColor(cat.name).dot}`} /> {cat.name}
+                    </span>
                     </span>
                     <button
                       onClick={() => deleteCategory(cat.id)}
