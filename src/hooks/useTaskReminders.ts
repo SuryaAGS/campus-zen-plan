@@ -76,18 +76,18 @@ function markNotifiedThisSession() {
   sessionStorage.setItem(SESSION_KEY, "true");
 }
 
-function getTimeNotifiedIds(): Set<string> {
+function getTimeNotifiedIds(key = TIME_NOTIFIED_KEY): Set<string> {
   try {
-    return new Set(JSON.parse(sessionStorage.getItem(TIME_NOTIFIED_KEY) || "[]"));
+    return new Set(JSON.parse(sessionStorage.getItem(key) || "[]"));
   } catch {
     return new Set();
   }
 }
 
-function markTimeNotified(ids: string[]) {
-  const existing = getTimeNotifiedIds();
+function markTimeNotified(ids: string[], key = TIME_NOTIFIED_KEY) {
+  const existing = getTimeNotifiedIds(key);
   ids.forEach((id) => existing.add(id));
-  sessionStorage.setItem(TIME_NOTIFIED_KEY, JSON.stringify([...existing]));
+  sessionStorage.setItem(key, JSON.stringify([...existing]));
 }
 
 function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string) {
