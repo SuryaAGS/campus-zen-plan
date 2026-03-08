@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
   GraduationCap, Moon, Sun, LogOut, UserCircle, CalendarDays, 
-  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw
+  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
@@ -14,11 +14,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import StreakBadge from "@/components/StreakBadge";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [rawTasks, setRawTasks] = useState<Array<{ date: string; completed: boolean }>>([]);
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
   const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
@@ -70,6 +72,7 @@ const Dashboard = () => {
       missedCount: (t as any).missed_count ?? 0,
     }));
 
+    setRawTasks((data || []).map((t) => ({ date: t.date || tomorrowStr, completed: !!t.completed })));
     setRescheduledTasks(mapped.filter((t) => !t.completed && t.missedCount > 0));
     const taskState: Task[] = mapped.map(({ missedCount, ...rest }) => rest);
     setTasks(taskState);
@@ -87,6 +90,26 @@ const Dashboard = () => {
   const dueToday = pending.filter((t) => t.date === today);
   const highPriority = pending.filter((t) => t.priority === "High");
   const progressPercent = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
+
+  const weeklyData = useMemo(() => {
+    const days: { day: string; date: string; completed: number; total: number }[] = [];
+    const now = new Date();
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      const dayTasks = rawTasks.filter((t) => t.date === dateStr);
+      const dayCompleted = dayTasks.filter((t) => t.completed);
+      days.push({
+        day: i === 0 ? "Today" : dayNames[d.getDay()],
+        date: dateStr,
+        completed: dayCompleted.length,
+        total: dayTasks.length,
+      });
+    }
+    return days;
+  }, [rawTasks]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -255,7 +278,60 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* Streak */}
+        {/* Weekly Progress Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="mb-8"
+        >
+          <Card className="border-none shadow-elevated">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Weekly Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-52">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weeklyData} barGap={4}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={24} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                      }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                      formatter={(value: number, name: string) => [
+                        value,
+                        name === "completed" ? "Completed" : "Total",
+                      ]}
+                    />
+                    <Bar dataKey="total" fill="hsl(var(--muted-foreground) / 0.25)" radius={[4, 4, 0, 0]} name="total" />
+                    <Bar dataKey="completed" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="completed" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-muted-foreground/25" />
+                  Total
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
+                  Completed
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
