@@ -88,7 +88,6 @@ const Categories = () => {
                     <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                       <span className={`inline-block h-3 w-3 rounded-full ${getCategoryColor(cat.name).dot}`} /> {cat.name}
                     </span>
-                    </span>
                     <button
                       onClick={() => deleteCategory(cat.id)}
                       className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
