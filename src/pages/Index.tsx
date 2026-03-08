@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun } from "lucide-react";
 import mascot from "@/assets/mascot.png";
 import { Task, CATEGORIES, Category } from "@/types/task";
@@ -55,6 +56,12 @@ const Index = () => {
   const completeTask = (id: string) => {
     persist(tasks.map((t) => (t.id === id ? { ...t, completed: true } : t)));
     setStreak(recordCompletion());
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      origin: { y: 0.7 },
+      colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
+    });
   };
   const deleteTask = (id: string) => persist(tasks.filter((t) => t.id !== id));
 
