@@ -39,9 +39,10 @@ const Categories = () => {
             {CATEGORIES.map((c) => (
               <span
                 key={c}
-                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1.5 text-sm font-medium text-accent-foreground"
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium ${getCategoryColor(c).bg} ${getCategoryColor(c).text}`}
               >
-                <Tag size={12} /> {c}
+                <span className={`inline-block h-2.5 w-2.5 rounded-full ${getCategoryColor(c).dot}`} />
+                {c}
               </span>
             ))}
           </div>
