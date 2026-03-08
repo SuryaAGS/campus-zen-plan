@@ -36,8 +36,18 @@ async function sendBrowserNotification(title: string, body: string) {
   }
 }
 
+const SESSION_KEY = "collegemate-notified-session";
+
+function hasNotifiedThisSession(): boolean {
+  return sessionStorage.getItem(SESSION_KEY) === "true";
+}
+
+function markNotifiedThisSession() {
+  sessionStorage.setItem(SESSION_KEY, "true");
+}
+
 export function useTaskReminders(tasks: Task[]) {
-  const hasNotified = useRef(false);
+  const hasNotified = useRef(hasNotifiedThisSession());
   const tasksRef = useRef<Task[]>([]);
   
   // Keep tasks ref in sync without triggering effects
@@ -68,6 +78,7 @@ export function useTaskReminders(tasks: Task[]) {
 
     if (dueToday.length > 0 || dueTomorrow.length > 0) {
       hasNotified.current = true;
+      markNotifiedThisSession();
     }
   }, []);
 
