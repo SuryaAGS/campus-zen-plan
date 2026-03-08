@@ -66,6 +66,20 @@ function markNotifiedThisSession() {
   sessionStorage.setItem(SESSION_KEY, "true");
 }
 
+function getTimeNotifiedIds(): Set<string> {
+  try {
+    return new Set(JSON.parse(sessionStorage.getItem(TIME_NOTIFIED_KEY) || "[]"));
+  } catch {
+    return new Set();
+  }
+}
+
+function markTimeNotified(ids: string[]) {
+  const existing = getTimeNotifiedIds();
+  ids.forEach((id) => existing.add(id));
+  sessionStorage.setItem(TIME_NOTIFIED_KEY, JSON.stringify([...existing]));
+}
+
 export function useTaskReminders(tasks: Task[]) {
   const hasNotified = useRef(hasNotifiedThisSession());
   const tasksRef = useRef<Task[]>([]);
