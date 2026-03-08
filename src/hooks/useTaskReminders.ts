@@ -21,9 +21,19 @@ function requestNotificationPermission() {
   }
 }
 
-function sendBrowserNotification(title: string, body: string) {
-  if ("Notification" in window && Notification.permission === "granted") {
-    new Notification(title, { body, icon: "/favicon.ico" });
+async function sendBrowserNotification(title: string, body: string) {
+  try {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    // Use ServiceWorker notification for PWA/mobile compatibility
+    const reg = await navigator.serviceWorker?.ready;
+    if (reg) {
+      reg.showNotification(title, { body, icon: "/favicon.ico" });
+    } else {
+      // Fallback for desktop browsers
+      new Notification(title, { body, icon: "/favicon.ico" });
+    }
+  } catch {
+    // Silently fail — toast notifications still work as fallback
   }
 }
 
