@@ -80,22 +80,27 @@ const Index = () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split("T")[0];
 
-    const mapped: Task[] = [];
-    for (const t of data || []) {
-      const task: Task = {
-        id: t.id,
-        title: t.title,
-        date: t.date,
-        time: (t as any).time || null,
-        priority: t.priority as Task["priority"],
-        category: t.category as Category,
-        completed: t.completed,
-      };
-      if (!task.completed && new Date(task.date) < today) {
+    const mapped: Task[] = (data || []).map((t) => ({
+      id: t.id,
+      title: t.title,
+      date: t.date,
+      time: t.time || null,
+      priority: t.priority as Task["priority"],
+      category: t.category as Category,
+      completed: t.completed,
+    }));
+
+    // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
+    const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
+    if (overdue.length > 0) {
+      for (const task of overdue) {
         task.date = tomorrowStr;
-        await supabase.from("tasks").update({ date: tomorrowStr }).eq("id", task.id);
       }
-      mapped.push(task);
+      supabase
+        .from("tasks")
+        .update({ date: tomorrowStr })
+        .in("id", overdue.map((t) => t.id))
+        .then(() => {});
     }
 
     setTasks(mapped);
