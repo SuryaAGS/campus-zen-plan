@@ -136,6 +136,15 @@ const Index = () => {
     fetchTasks();
   };
 
+  const uncompleteTask = async (id: string) => {
+    const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
+    if (error) {
+      toast.error("Failed to undo completion");
+      return;
+    }
+    fetchTasks();
+  };
+
   const deleteTask = async (id: string) => {
     const { error } = await supabase.from("tasks").delete().eq("id", id);
     if (error) {
