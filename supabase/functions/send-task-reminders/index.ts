@@ -62,8 +62,7 @@ Deno.serve(async (req) => {
     }
 
     const nowMs = now.getTime();
-    const FIFTEEN_MIN = 15 * 60 * 1000;
-    const THIRTY_MIN = 30 * 60 * 1000;
+    const FIVE_MIN = 5 * 60 * 1000;
 
     // Separate tasks into time-specific (due within 30 min window) and date-only
     const tasksByUser: Record<string, {
