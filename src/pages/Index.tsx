@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
@@ -260,6 +260,12 @@ const Index = () => {
           >
             Start Planning
             <ArrowDown size={20} />
+          </button>
+          <button
+            onClick={() => navigate("/install")}
+            className="ml-3 inline-flex items-center gap-2 rounded-full bg-primary-foreground/20 px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:scale-105 hover:bg-primary-foreground/30"
+          >
+            <Download size={16} /> Install App
           </button>
         </motion.div>
       </section>
