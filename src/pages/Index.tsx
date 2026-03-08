@@ -84,6 +84,7 @@ const Index = () => {
         id: t.id,
         title: t.title,
         date: t.date,
+        time: (t as any).time || null,
         priority: t.priority as Task["priority"],
         category: t.category as Category,
         completed: t.completed,
