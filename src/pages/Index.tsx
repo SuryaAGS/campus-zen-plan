@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, GraduationCap, ArrowDown, Filter } from "lucide-react";
+import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun } from "lucide-react";
 import mascot from "@/assets/mascot.png";
 import { Task, CATEGORIES, Category } from "@/types/task";
 import { loadTasks, saveTasks, getAiSuggestion, autoReschedule, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
@@ -17,7 +17,13 @@ const Index = () => {
   const [category, setCategory] = useState<Category>("Assignment");
   const [filterCategory, setFilterCategory] = useState<Category | "All">("All");
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
+  const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
   const appRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("collegemate-dark", String(dark));
+  }, [dark]);
 
   useEffect(() => {
     const loaded = autoReschedule(loadTasks());
@@ -62,6 +68,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Dark Mode Toggle */}
+      <button
+        onClick={() => setDark((d) => !d)}
+        className="fixed right-4 top-4 z-50 rounded-full bg-card p-3 shadow-elevated transition-all hover:scale-110"
+        aria-label="Toggle dark mode"
+      >
+        {dark ? <Sun size={20} className="text-foreground" /> : <Moon size={20} className="text-foreground" />}
+      </button>
       {/* Landing Hero */}
       <section className="gradient-bg flex min-h-screen flex-col items-center justify-center px-4 text-center">
         <motion.div
