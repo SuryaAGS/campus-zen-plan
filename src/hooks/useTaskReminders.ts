@@ -20,19 +20,28 @@ function getTasksDueSoon(tasks: Task[]) {
 function getTasksDueSoonByTime(tasks: Task[]) {
   const now = new Date();
   const nowMs = now.getTime();
+  const ONE_MIN = 60 * 1000;
   const FIVE_MIN = 5 * 60 * 1000;
 
-  const dueSoon: Task[] = [];
+  const dueNow: Task[] = [];
+  const dueFiveMin: Task[] = [];
+
   for (const t of tasks) {
     if (t.completed || !t.time || !t.date) continue;
     const taskDateTime = new Date(`${t.date}T${t.time}`);
     if (isNaN(taskDateTime.getTime())) continue;
     const diff = taskDateTime.getTime() - nowMs;
-    if (diff <= FIVE_MIN && diff >= -FIVE_MIN) {
-      dueSoon.push(t);
+
+    // Exact time: within ±1 minute
+    if (diff >= -ONE_MIN && diff <= ONE_MIN) {
+      dueNow.push(t);
+    }
+    // 5 minutes before: between 4 and 6 minutes ahead
+    else if (diff > 4 * ONE_MIN && diff <= 6 * ONE_MIN) {
+      dueFiveMin.push(t);
     }
   }
-  return dueSoon;
+  return { dueNow, dueFiveMin };
 }
 
 function requestNotificationPermission() {
