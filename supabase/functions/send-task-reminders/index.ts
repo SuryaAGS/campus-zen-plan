@@ -126,12 +126,22 @@ Deno.serve(async (req) => {
 
       const notifications: { title: string; body: string }[] = [];
 
-      // Time-specific notifications (highest priority)
-      if (userTasks.dueSoon.length > 0) {
-        for (const task of userTasks.dueSoon) {
+      // 5-minute warning
+      if (userTasks.dueFiveMin.length > 0) {
+        for (const task of userTasks.dueFiveMin) {
           notifications.push({
-            title: "⏰ Coming Up Soon",
-            body: `"${task.title}" is due at ${task.time}!`,
+            title: "⏳ 5 Minutes Left",
+            body: `"${task.title}" starts at ${task.time} — 5 minutes!`,
+          });
+        }
+      }
+
+      // Exact time notifications
+      if (userTasks.dueNow.length > 0) {
+        for (const task of userTasks.dueNow) {
+          notifications.push({
+            title: "⏰ Task Due Now",
+            body: `"${task.title}" is due NOW!`,
           });
         }
       }
