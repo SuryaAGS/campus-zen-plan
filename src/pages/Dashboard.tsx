@@ -76,7 +76,10 @@ const Dashboard = () => {
     setStreak(refreshStreak());
   }, []);
 
-  const [rescheduledTasks, setRescheduledTasks] = useState<Array<{ id: string; title: string; date: string; time: string | null; missedCount: number }>>([]);
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
 
   const pending = tasks.filter((t) => !t.completed);
   const completed = tasks.filter((t) => t.completed);
