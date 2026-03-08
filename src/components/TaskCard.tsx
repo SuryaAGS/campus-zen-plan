@@ -3,13 +3,16 @@ import { motion } from "framer-motion";
 import { Check, Trash2, Undo2 } from "lucide-react";
 import { Task } from "@/types/task";
 import { getCategoryColor, getCategoryEmoji } from "@/lib/categoryColors";
+import EditTaskDialog from "@/components/EditTaskDialog";
 
 interface TaskCardProps {
   task: Task;
   index: number;
   onComplete: (id: string) => void;
   onUncomplete?: (id: string) => void;
-  onDelete: (id: string) => void;
+  onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => void;
+  onDelete: (id: string);
+  allCategories: string[];
 }
 
 const priorityStyles = {
