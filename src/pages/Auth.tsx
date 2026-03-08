@@ -62,7 +62,7 @@ export default function Auth() {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
+          {mode === "signup" && (
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Display Name</label>
               <input
@@ -86,25 +86,36 @@ export default function Auth() {
               required
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              required
-              minLength={6}
-            />
-          </div>
+          {!isForgot && (
+            <div>
+              <label className="mb-1 block text-xs font-medium text-muted-foreground">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                required
+                minLength={6}
+              />
+              {isLogin && (
+                <button
+                  type="button"
+                  onClick={() => setMode("forgot")}
+                  className="mt-1 text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </button>
+              )}
+            </div>
+          )}
           <button
             type="submit"
             disabled={loading}
             className="gradient-bg flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110 disabled:opacity-50"
           >
-            {isLogin ? <LogIn size={16} /> : <UserPlus size={16} />}
-            {loading ? "Please wait..." : isLogin ? "Sign In" : "Sign Up"}
+            {isForgot ? <KeyRound size={16} /> : isLogin ? <LogIn size={16} /> : <UserPlus size={16} />}
+            {loading ? "Please wait..." : isForgot ? "Send Reset Link" : isLogin ? "Sign In" : "Sign Up"}
           </button>
         </form>
 
