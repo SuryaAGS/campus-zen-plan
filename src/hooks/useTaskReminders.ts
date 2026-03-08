@@ -78,6 +78,7 @@ export function useTaskReminders(tasks: Task[]) {
 
     if (dueToday.length > 0 || dueTomorrow.length > 0) {
       hasNotified.current = true;
+      markNotifiedThisSession();
     }
   }, []);
 
