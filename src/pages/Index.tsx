@@ -34,9 +34,18 @@ const Index = () => {
       .from("profiles")
       .select("display_name, avatar_url")
       .eq("user_id", user.id)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
-        if (data) setProfile(data);
+        if (data) {
+          setProfile(data);
+        } else {
+          // Fall back to auth user metadata (e.g. Google OAuth)
+          const meta = user.user_metadata;
+          setProfile({
+            display_name: meta?.full_name || meta?.display_name || meta?.name || null,
+            avatar_url: meta?.avatar_url || meta?.picture || null,
+          });
+        }
       });
   }, [user]);
 
