@@ -119,66 +119,88 @@ const Index = () => {
 
   const addTask = async () => {
     if (!title || !date || !user) return;
-    const { error } = await supabase.from("tasks").insert({
-      user_id: user.id,
-      title,
-      date,
-      time: time || null,
-      priority,
-      category,
-    } as any);
-    if (error) {
+    try {
+      const { error } = await supabase.from("tasks").insert({
+        user_id: user.id,
+        title,
+        date,
+        time: time || null,
+        priority,
+        category,
+      } as any);
+      if (error) {
+        console.error("addTask error:", error);
+        toast.error("Failed to add task");
+        return;
+      }
+      setTitle("");
+      setDate("");
+      setTime("");
+      fetchTasks();
+    } catch (err) {
+      console.error("addTask unexpected error:", err);
       toast.error("Failed to add task");
-      return;
     }
-    setTitle("");
-    setDate("");
-    setTime("");
-    fetchTasks();
   };
 
   const completeTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
-    if (error) {
-      toast.error("Failed to complete task");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
+      if (error) {
+        toast.error("Failed to complete task");
+        return;
+      }
+      setStreak(recordCompletion());
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.7 },
+        colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
+      });
+      fetchTasks();
+    } catch (err) {
+      console.error("completeTask error:", err);
     }
-    setStreak(recordCompletion());
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.7 },
-      colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"],
-    });
-    fetchTasks();
   };
 
   const uncompleteTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
-    if (error) {
-      toast.error("Failed to undo completion");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").update({ completed: false }).eq("id", id);
+      if (error) {
+        toast.error("Failed to undo completion");
+        return;
+      }
+      fetchTasks();
+    } catch (err) {
+      console.error("uncompleteTask error:", err);
     }
-    fetchTasks();
   };
 
   const deleteTask = async (id: string) => {
-    const { error } = await supabase.from("tasks").delete().eq("id", id);
-    if (error) {
-      toast.error("Failed to delete task");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").delete().eq("id", id);
+      if (error) {
+        toast.error("Failed to delete task");
+        return;
+      }
+      fetchTasks();
+    } catch (err) {
+      console.error("deleteTask error:", err);
     }
-    fetchTasks();
   };
 
   const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => {
-    const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
-    if (error) {
-      toast.error("Failed to update task");
-      return;
+    try {
+      const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
+      if (error) {
+        toast.error("Failed to update task");
+        return;
+      }
+      toast.success("Task updated");
+      fetchTasks();
+    } catch (err) {
+      console.error("editTask error:", err);
     }
-    toast.success("Task updated");
-    fetchTasks();
   };
 
   const reminders = useTaskReminders(tasks);
