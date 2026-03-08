@@ -159,6 +159,14 @@ export default function Profile() {
             <Save size={16} />
             {loading ? "Saving..." : "Save Changes"}
           </button>
+
+          <button
+            onClick={() => navigate("/notifications")}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-input py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <Bell size={16} />
+            Notification Settings
+          </button>
         </motion.div>
       </div>
     </div>
