@@ -93,6 +93,7 @@ const MyTasks = () => {
         priority: (t.priority as Task["priority"]) || "Medium",
         category: (t.category as Category) || "Other",
         completed: !!t.completed,
+        note: (t as any).note || null,
         missedCount: (t as any).missed_count ?? 0,
       }));
 
