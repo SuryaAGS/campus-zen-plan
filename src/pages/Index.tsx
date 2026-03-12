@@ -328,11 +328,11 @@ const Index = () => {
       <div ref={appRef} className="gradient-bg min-h-screen">
         <div className="container mx-auto max-w-3xl px-4 py-8">
           <motion.div initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8 text-center">
-            <div className="mb-4 flex items-center justify-center gap-3">
-              <GraduationCap size={36} className="text-primary-foreground" />
-              <h2 className="font-display text-4xl font-bold text-primary-foreground">CollegeMate</h2>
-            </div>
-            <p className="text-lg text-primary-foreground/80">Smart AI-powered student productivity</p>
+             <div className="mb-4 flex items-center justify-center gap-3">
+               <ClipboardCheck size={36} className="text-primary-foreground" />
+               <h2 className="font-display text-4xl font-bold text-primary-foreground">Tasks To Do</h2>
+             </div>
+             <p className="text-lg text-primary-foreground/80">Smart AI-powered daily productivity</p>
           </motion.div>
 
           {/* Add Task Form */}
