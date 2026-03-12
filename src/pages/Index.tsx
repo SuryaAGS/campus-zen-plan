@@ -95,21 +95,27 @@ const Index = () => {
         note: (t as any).note || null,
       }));
 
-      // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
-      const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
+      // Auto-reschedule overdue tasks immediately (30 min from now)
+      const now = new Date();
+      const overdue = mapped.filter((t) => !t.completed && new Date(`${t.date}T${t.time || "00:00"}`) < now);
       if (overdue.length > 0) {
+        const rescheduleTime = new Date();
+        rescheduleTime.setMinutes(rescheduleTime.getMinutes() + 30);
+        const newDate = rescheduleTime.toISOString().split("T")[0];
+        const newTime = rescheduleTime.toTimeString().slice(0, 5);
         const taskNames = overdue.slice(0, 3).map((t) => `"${t.title}"`).join(", ");
         const extra = overdue.length > 3 ? ` and ${overdue.length - 3} more` : "";
         for (const task of overdue) {
-          task.date = tomorrowStr;
+          task.date = newDate;
+          task.time = newTime;
         }
         supabase
           .from("tasks")
-          .update({ date: tomorrowStr })
+          .update({ date: newDate, time: newTime } as any)
           .in("id", overdue.map((t) => t.id))
           .then(() => {});
-        toast.info(`🔄 ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""} rescheduled to tomorrow`, {
-          description: `${taskNames}${extra}`,
+        toast.info(`🔄 ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""} rescheduled`, {
+          description: `${taskNames}${extra} → ${newTime}`,
           duration: 6000,
         });
       }
