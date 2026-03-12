@@ -31,6 +31,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
       setTime(task.time || "");
       setPriority(task.priority);
       setCategory(task.category);
+      setNote(task.note || "");
     }
     setOpen(isOpen);
   };
