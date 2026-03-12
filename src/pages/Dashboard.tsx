@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
-import mascot from "@/assets/mascot.png";
+import appIcon from "@/assets/app-icon.png";
 import { Task, Category } from "@/types/task";
 import { refreshStreak, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
