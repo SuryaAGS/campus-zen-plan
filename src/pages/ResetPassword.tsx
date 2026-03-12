@@ -57,7 +57,7 @@ export default function ResetPassword() {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md rounded-xl bg-card p-8 shadow-elevated text-center"
         >
-          <GraduationCap size={32} className="mx-auto text-primary mb-4" />
+          <ClipboardCheck size={32} className="mx-auto text-primary mb-4" />
           <h2 className="font-display text-xl font-semibold text-card-foreground mb-2">Invalid Link</h2>
           <p className="text-sm text-muted-foreground mb-4">
             This password reset link is invalid or has expired.
