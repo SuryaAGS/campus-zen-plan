@@ -12,7 +12,7 @@ import {
 interface EditTaskDialogProps {
   task: Task;
   allCategories: string[];
-  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => void;
+  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null }) => void;
 }
 
 const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) => {
