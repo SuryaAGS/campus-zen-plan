@@ -19,6 +19,7 @@ const AddTask = () => {
   const [category, setCategory] = useState<string>("Assignment");
   const { allCategoryNames } = useCategories();
   const [adding, setAdding] = useState(false);
+  const [note, setNote] = useState("");
 
   const addTask = async () => {
     if (!title || !date || !user) {
