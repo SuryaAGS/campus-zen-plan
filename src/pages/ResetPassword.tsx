@@ -81,8 +81,8 @@ export default function ResetPassword() {
         className="w-full max-w-md rounded-xl bg-card p-8 shadow-elevated"
       >
         <div className="mb-6 flex items-center justify-center gap-2">
-          <GraduationCap size={32} className="text-primary" />
-          <h1 className="font-display text-2xl font-bold text-card-foreground">CollegeMate</h1>
+          <ClipboardCheck size={32} className="text-primary" />
+          <h1 className="font-display text-2xl font-bold text-card-foreground">Tasks To Do</h1>
         </div>
 
         <h2 className="mb-6 text-center font-display text-xl font-semibold text-card-foreground">
