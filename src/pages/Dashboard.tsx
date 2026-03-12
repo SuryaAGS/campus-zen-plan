@@ -189,7 +189,7 @@ const Dashboard = () => {
           className="mb-8 text-center"
         >
           <div className="mb-4 flex items-center justify-center gap-3">
-            <img src={mascot} alt="Mascot" className="h-16 w-16 drop-shadow-lg" />
+            <img src={appIcon} alt="Tasks To Do" className="h-16 w-16 drop-shadow-lg" />
             <div>
               <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
                 Welcome back{profile.display_name ? `, ${profile.display_name.split(" ")[0]}` : ""}!
