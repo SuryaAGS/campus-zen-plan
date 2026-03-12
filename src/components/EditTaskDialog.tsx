@@ -22,6 +22,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
   const [time, setTime] = useState(task.time || "");
   const [priority, setPriority] = useState<string>(task.priority);
   const [category, setCategory] = useState<string>(task.category);
+  const [note, setNote] = useState(task.note || "");
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
