@@ -21,9 +21,9 @@ function getTasksDueSoonByTime(tasks: Task[]) {
   const now = new Date();
   const nowMs = now.getTime();
   const ONE_MIN = 60 * 1000;
-  const FIVE_MIN = 5 * 60 * 1000;
 
   const dueNow: Task[] = [];
+  const dueTwoMin: Task[] = [];
   const dueFiveMin: Task[] = [];
 
   for (const t of tasks) {
@@ -36,12 +36,16 @@ function getTasksDueSoonByTime(tasks: Task[]) {
     if (diff >= -ONE_MIN && diff <= ONE_MIN) {
       dueNow.push(t);
     }
+    // 2 minutes before: between 1 and 3 minutes ahead
+    else if (diff > 1 * ONE_MIN && diff <= 3 * ONE_MIN) {
+      dueTwoMin.push(t);
+    }
     // 5 minutes before: between 4 and 6 minutes ahead
     else if (diff > 4 * ONE_MIN && diff <= 6 * ONE_MIN) {
       dueFiveMin.push(t);
     }
   }
-  return { dueNow, dueFiveMin };
+  return { dueNow, dueTwoMin, dueFiveMin };
 }
 
 function requestNotificationPermission() {
