@@ -335,6 +335,15 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
+        {/* AI Suggestion */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="mb-8"
+        >
+          <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
