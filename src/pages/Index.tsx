@@ -8,7 +8,8 @@ import mascot from "@/assets/mascot.png";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryColor } from "@/lib/categoryColors";
-import { getAiSuggestion, refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
+import { refreshStreak, recordCompletion, StreakData } from "@/lib/tasks";
+import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import TaskCard from "@/components/TaskCard";
@@ -212,6 +213,7 @@ const Index = () => {
     }
   };
 
+  const { suggestion: aiSuggestion, loading: aiLoading, refresh: refreshAi } = useAiSuggestion(tasks.length);
   const reminders = useTaskReminders(tasks);
   const filtered = (filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory))
     .filter((t) => !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -461,7 +463,7 @@ const Index = () => {
           <div className="space-y-4">
             <StreakBadge streak={streak.current} />
             <ProgressBar completed={completed.length} total={tasks.length} />
-            <AiSuggestion tip={getAiSuggestion(tasks)} />
+            <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
           </div>
         </div>
       </div>

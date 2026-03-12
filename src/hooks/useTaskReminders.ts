@@ -21,9 +21,9 @@ function getTasksDueSoonByTime(tasks: Task[]) {
   const now = new Date();
   const nowMs = now.getTime();
   const ONE_MIN = 60 * 1000;
-  const FIVE_MIN = 5 * 60 * 1000;
 
   const dueNow: Task[] = [];
+  const dueTwoMin: Task[] = [];
   const dueFiveMin: Task[] = [];
 
   for (const t of tasks) {
@@ -36,17 +36,25 @@ function getTasksDueSoonByTime(tasks: Task[]) {
     if (diff >= -ONE_MIN && diff <= ONE_MIN) {
       dueNow.push(t);
     }
+    // 2 minutes before: between 1 and 3 minutes ahead
+    else if (diff > 1 * ONE_MIN && diff <= 3 * ONE_MIN) {
+      dueTwoMin.push(t);
+    }
     // 5 minutes before: between 4 and 6 minutes ahead
     else if (diff > 4 * ONE_MIN && diff <= 6 * ONE_MIN) {
       dueFiveMin.push(t);
     }
   }
-  return { dueNow, dueFiveMin };
+  return { dueNow, dueTwoMin, dueFiveMin };
 }
 
 function requestNotificationPermission() {
   if ("Notification" in window && Notification.permission === "default") {
-    Notification.requestPermission();
+    Notification.requestPermission().then((result) => {
+      if (result === "granted") {
+        toast.success("🔔 Notifications enabled! You'll get alerts for upcoming tasks.");
+      }
+    });
   }
 }
 
@@ -66,6 +74,7 @@ async function sendBrowserNotification(title: string, body: string) {
 
 const SESSION_KEY = "collegemate-notified-session";
 const TIME_NOTIFIED_KEY = "collegemate-time-notified";
+const TIME_2MIN_NOTIFIED_KEY = "collegemate-time-2min-notified";
 const TIME_5MIN_NOTIFIED_KEY = "collegemate-time-5min-notified";
 
 function hasNotifiedThisSession(): boolean {
@@ -144,7 +153,7 @@ export function useTaskReminders(tasks: Task[]) {
     const settings = getNotificationSettings();
     if (!settings.enableDueToday) return;
 
-    const { dueNow, dueFiveMin } = getTasksDueSoonByTime(currentTasks);
+    const { dueNow, dueTwoMin, dueFiveMin } = getTasksDueSoonByTime(currentTasks);
 
     // 5-minute warning
     const already5min = getTimeNotifiedIds(TIME_5MIN_NOTIFIED_KEY);
@@ -155,6 +164,16 @@ export function useTaskReminders(tasks: Task[]) {
       if (settings.enablePushNotifications) sendBrowserNotification("⏳ 5 Minutes Left", msg);
     }
     if (new5min.length > 0) markTimeNotified(new5min.map((t) => t.id), TIME_5MIN_NOTIFIED_KEY);
+
+    // 2-minute warning
+    const already2min = getTimeNotifiedIds(TIME_2MIN_NOTIFIED_KEY);
+    const new2min = dueTwoMin.filter((t) => !already2min.has(t.id) && !isSnoozed(`toast-time-2min-${t.id}`));
+    for (const task of new2min) {
+      const msg = `"${task.title}" starts at ${task.time} — 2 minutes!`;
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⚡ ${msg}`, `toast-time-2min-${task.id}`);
+      if (settings.enablePushNotifications) sendBrowserNotification("⚡ 2 Minutes Left", msg);
+    }
+    if (new2min.length > 0) markTimeNotified(new2min.map((t) => t.id), TIME_2MIN_NOTIFIED_KEY);
 
     // Exact time notification
     const alreadyNotified = getTimeNotifiedIds(TIME_NOTIFIED_KEY);

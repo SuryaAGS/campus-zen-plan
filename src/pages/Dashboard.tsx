@@ -12,6 +12,8 @@ import { refreshStreak, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import StreakBadge from "@/components/StreakBadge";
+import AiSuggestion from "@/components/AiSuggestion";
+import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -83,6 +85,8 @@ const Dashboard = () => {
     fetchTasks();
   }, [fetchTasks]);
 
+
+  const { suggestion: aiSuggestion, loading: aiLoading, refresh: refreshAi } = useAiSuggestion(tasks.length);
 
   const pending = tasks.filter((t) => !t.completed);
   const completed = tasks.filter((t) => t.completed);
@@ -331,6 +335,15 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
+        {/* AI Suggestion */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="mb-8"
+        >
+          <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

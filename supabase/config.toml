@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-task-reminders]
 verify_jwt = false
+
+[functions.ai-suggestions]
+verify_jwt = false
