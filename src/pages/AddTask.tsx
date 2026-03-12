@@ -46,6 +46,7 @@ const AddTask = () => {
       setTitle("");
       setDate("");
       setTime("");
+      setNote("");
     } catch {
       toast.error("Failed to add task");
     } finally {
