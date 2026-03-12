@@ -19,6 +19,7 @@ const AddTask = () => {
   const [category, setCategory] = useState<string>("Assignment");
   const { allCategoryNames } = useCategories();
   const [adding, setAdding] = useState(false);
+  const [note, setNote] = useState("");
 
   const addTask = async () => {
     if (!title || !date || !user) {
@@ -35,6 +36,7 @@ const AddTask = () => {
         time: time || null,
         priority,
         category,
+        note: note || null,
       } as any);
       if (error) {
         toast.error("Failed to add task");
@@ -44,6 +46,7 @@ const AddTask = () => {
       setTitle("");
       setDate("");
       setTime("");
+      setNote("");
     } catch {
       toast.error("Failed to add task");
     } finally {
@@ -156,6 +159,18 @@ const AddTask = () => {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Note */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Note (optional)</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Add any details or reminders..."
+                  rows={2}
+                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                />
               </div>
 
               {/* Submit */}

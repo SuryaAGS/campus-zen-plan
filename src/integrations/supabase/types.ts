@@ -118,6 +118,7 @@ export type Database = {
           date: string
           id: string
           missed_count: number
+          note: string | null
           priority: string
           time: string | null
           title: string
@@ -131,6 +132,7 @@ export type Database = {
           date: string
           id?: string
           missed_count?: number
+          note?: string | null
           priority: string
           time?: string | null
           title: string
@@ -144,6 +146,7 @@ export type Database = {
           date?: string
           id?: string
           missed_count?: number
+          note?: string | null
           priority?: string
           time?: string | null
           title?: string

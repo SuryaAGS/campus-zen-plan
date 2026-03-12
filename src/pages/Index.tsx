@@ -34,7 +34,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { allCategoryNames } = useCategories();
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
-  const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
+  const [dark, setDark] = useState(() => localStorage.getItem("taskstodo-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
   const appRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +61,7 @@ const Index = () => {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("collegemate-dark", String(dark));
+    localStorage.setItem("taskstodo-dark", String(dark));
   }, [dark]);
 
   // Load tasks from Supabase
@@ -92,23 +92,30 @@ const Index = () => {
         priority: (t.priority as Task["priority"]) || "Medium",
         category: (t.category as Category) || "Other",
         completed: !!t.completed,
+        note: (t as any).note || null,
       }));
 
-      // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
-      const overdue = mapped.filter((t) => !t.completed && new Date(t.date) < today);
+      // Auto-reschedule overdue tasks immediately (30 min from now)
+      const now = new Date();
+      const overdue = mapped.filter((t) => !t.completed && new Date(`${t.date}T${t.time || "00:00"}`) < now);
       if (overdue.length > 0) {
+        const rescheduleTime = new Date();
+        rescheduleTime.setMinutes(rescheduleTime.getMinutes() + 30);
+        const newDate = rescheduleTime.toISOString().split("T")[0];
+        const newTime = rescheduleTime.toTimeString().slice(0, 5);
         const taskNames = overdue.slice(0, 3).map((t) => `"${t.title}"`).join(", ");
         const extra = overdue.length > 3 ? ` and ${overdue.length - 3} more` : "";
         for (const task of overdue) {
-          task.date = tomorrowStr;
+          task.date = newDate;
+          task.time = newTime;
         }
         supabase
           .from("tasks")
-          .update({ date: tomorrowStr })
+          .update({ date: newDate, time: newTime } as any)
           .in("id", overdue.map((t) => t.id))
           .then(() => {});
-        toast.info(`🔄 ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""} rescheduled to tomorrow`, {
-          description: `${taskNames}${extra}`,
+        toast.info(`🔄 ${overdue.length} overdue task${overdue.length > 1 ? "s" : ""} rescheduled`, {
+          description: `${taskNames}${extra} → ${newTime}`,
           duration: 6000,
         });
       }

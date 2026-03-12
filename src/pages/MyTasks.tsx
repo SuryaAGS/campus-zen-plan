@@ -93,6 +93,7 @@ const MyTasks = () => {
         priority: (t.priority as Task["priority"]) || "Medium",
         category: (t.category as Category) || "Other",
         completed: !!t.completed,
+        note: (t as any).note || null,
         missedCount: (t as any).missed_count ?? 0,
       }));
 
@@ -109,16 +110,9 @@ const MyTasks = () => {
 
         for (const task of overdue) {
           const newMissedCount = task.missedCount + 1;
+          // Immediate reschedule: move to 30 minutes from now
           const rescheduleTime = new Date();
-
-          if (newMissedCount === 1) {
-            rescheduleTime.setHours(rescheduleTime.getHours() + 3);
-          } else if (newMissedCount === 2) {
-            rescheduleTime.setHours(rescheduleTime.getHours() + 5);
-          } else {
-            rescheduleTime.setDate(rescheduleTime.getDate() + 1);
-            rescheduleTime.setHours(9, 0, 0, 0);
-          }
+          rescheduleTime.setMinutes(rescheduleTime.getMinutes() + 30);
 
           const newDate = rescheduleTime.toISOString().split("T")[0];
           const newTime = rescheduleTime.toTimeString().slice(0, 5);

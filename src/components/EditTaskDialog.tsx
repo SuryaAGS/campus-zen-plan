@@ -12,7 +12,7 @@ import {
 interface EditTaskDialogProps {
   task: Task;
   allCategories: string[];
-  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => void;
+  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null }) => void;
 }
 
 const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) => {
@@ -22,6 +22,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
   const [time, setTime] = useState(task.time || "");
   const [priority, setPriority] = useState<string>(task.priority);
   const [category, setCategory] = useState<string>(task.category);
+  const [note, setNote] = useState(task.note || "");
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
@@ -30,13 +31,14 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
       setTime(task.time || "");
       setPriority(task.priority);
       setCategory(task.category);
+      setNote(task.note || "");
     }
     setOpen(isOpen);
   };
 
   const handleSave = () => {
     if (!title || !date) return;
-    onSave(task.id, { title, date, time: time || null, priority, category });
+    onSave(task.id, { title, date, time: time || null, priority, category, note: note || null });
     setOpen(false);
   };
 
@@ -108,6 +110,16 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
                 ))}
               </select>
             </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Note (optional)</label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Add a quick note..."
+              rows={2}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
           </div>
           <button
             onClick={handleSave}

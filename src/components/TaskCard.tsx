@@ -36,6 +36,9 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
           <span className={`font-display font-semibold text-card-foreground ${task.completed ? "line-through opacity-50" : ""}`}>
             {task.title}
           </span>
+          {task.note && (
+            <p className="text-xs text-muted-foreground italic line-clamp-2">{task.note}</p>
+          )}
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className={`font-medium ${priorityStyles[task.priority].split(" ")[1]}`}>
               {task.priority}

@@ -72,10 +72,38 @@ async function sendBrowserNotification(title: string, body: string) {
   }
 }
 
-const SESSION_KEY = "collegemate-notified-session";
-const TIME_NOTIFIED_KEY = "collegemate-time-notified";
-const TIME_2MIN_NOTIFIED_KEY = "collegemate-time-2min-notified";
-const TIME_5MIN_NOTIFIED_KEY = "collegemate-time-5min-notified";
+const SESSION_KEY = "taskstodo-notified-session";
+const TIME_NOTIFIED_KEY = "taskstodo-time-notified";
+const TIME_2MIN_NOTIFIED_KEY = "taskstodo-time-2min-notified";
+const TIME_5MIN_NOTIFIED_KEY = "taskstodo-time-5min-notified";
+
+// Alarm sound for notifications
+function playAlarmSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    oscillator.type = "sine";
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.8);
+    // Second beep
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.frequency.setValueAtTime(1100, ctx.currentTime + 0.3);
+    osc2.type = "sine";
+    gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.3);
+    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.1);
+    osc2.start(ctx.currentTime + 0.3);
+    osc2.stop(ctx.currentTime + 1.1);
+  } catch {}
+}
 
 function hasNotifiedThisSession(): boolean {
   return sessionStorage.getItem(SESSION_KEY) === "true";
@@ -99,7 +127,8 @@ function markTimeNotified(ids: string[], key = TIME_NOTIFIED_KEY) {
   sessionStorage.setItem(key, JSON.stringify([...existing]));
 }
 
-function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string) {
+function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string, withAlarm = false) {
+  if (withAlarm) playAlarmSound();
   toast[type](message, {
     duration: 10000,
     action: {
@@ -170,7 +199,7 @@ export function useTaskReminders(tasks: Task[]) {
     const new2min = dueTwoMin.filter((t) => !already2min.has(t.id) && !isSnoozed(`toast-time-2min-${t.id}`));
     for (const task of new2min) {
       const msg = `"${task.title}" starts at ${task.time} — 2 minutes!`;
-      if (settings.enableToastReminders) showSnoozeableToast("warning", `⚡ ${msg}`, `toast-time-2min-${task.id}`);
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⚡ ${msg}`, `toast-time-2min-${task.id}`, true);
       if (settings.enablePushNotifications) sendBrowserNotification("⚡ 2 Minutes Left", msg);
     }
     if (new2min.length > 0) markTimeNotified(new2min.map((t) => t.id), TIME_2MIN_NOTIFIED_KEY);
@@ -180,7 +209,7 @@ export function useTaskReminders(tasks: Task[]) {
     const newDueNow = dueNow.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
     for (const task of newDueNow) {
       const msg = `"${task.title}" is due NOW!`;
-      if (settings.enableToastReminders) showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`, true);
       if (settings.enablePushNotifications) sendBrowserNotification("⏰ Task Due Now", msg);
     }
     if (newDueNow.length > 0) markTimeNotified(newDueNow.map((t) => t.id), TIME_NOTIFIED_KEY);

@@ -24,7 +24,7 @@ const Dashboard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [rawTasks, setRawTasks] = useState<Array<{ date: string; completed: boolean }>>([]);
   const [streak, setStreak] = useState<StreakData>({ current: 0, lastCompletionDate: null });
-  const [dark, setDark] = useState(() => localStorage.getItem("collegemate-dark") === "true");
+  const [dark, setDark] = useState(() => localStorage.getItem("taskstodo-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
   const [rescheduledTasks, setRescheduledTasks] = useState<Array<{ id: string; title: string; date: string; time: string | null; missedCount: number }>>([]);
 
@@ -50,7 +50,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("collegemate-dark", String(dark));
+    localStorage.setItem("taskstodo-dark", String(dark));
   }, [dark]);
 
   const fetchTasks = useCallback(async () => {
