@@ -86,6 +86,8 @@ const Dashboard = () => {
   }, [fetchTasks]);
 
 
+  const { suggestion: aiSuggestion, loading: aiLoading, refresh: refreshAi } = useAiSuggestion(tasks.length);
+
   const pending = tasks.filter((t) => !t.completed);
   const completed = tasks.filter((t) => t.completed);
   const today = new Date().toISOString().split("T")[0];
