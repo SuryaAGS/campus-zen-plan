@@ -72,10 +72,38 @@ async function sendBrowserNotification(title: string, body: string) {
   }
 }
 
-const SESSION_KEY = "collegemate-notified-session";
-const TIME_NOTIFIED_KEY = "collegemate-time-notified";
-const TIME_2MIN_NOTIFIED_KEY = "collegemate-time-2min-notified";
-const TIME_5MIN_NOTIFIED_KEY = "collegemate-time-5min-notified";
+const SESSION_KEY = "taskstodo-notified-session";
+const TIME_NOTIFIED_KEY = "taskstodo-time-notified";
+const TIME_2MIN_NOTIFIED_KEY = "taskstodo-time-2min-notified";
+const TIME_5MIN_NOTIFIED_KEY = "taskstodo-time-5min-notified";
+
+// Alarm sound for notifications
+function playAlarmSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    oscillator.type = "sine";
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.8);
+    // Second beep
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.frequency.setValueAtTime(1100, ctx.currentTime + 0.3);
+    osc2.type = "sine";
+    gain2.gain.setValueAtTime(0.3, ctx.currentTime + 0.3);
+    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.1);
+    osc2.start(ctx.currentTime + 0.3);
+    osc2.stop(ctx.currentTime + 1.1);
+  } catch {}
+}
 
 function hasNotifiedThisSession(): boolean {
   return sessionStorage.getItem(SESSION_KEY) === "true";

@@ -11,7 +11,7 @@ interface TaskRemindersProps {
   dueTomorrow: Task[];
 }
 
-const SNOOZE_KEY = "collegemate-snoozed-reminders";
+const SNOOZE_KEY = "taskstodo-snoozed-reminders";
 
 function getSnoozed(): Record<string, number> {
   try {

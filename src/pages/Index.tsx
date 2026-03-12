@@ -61,7 +61,7 @@ const Index = () => {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("collegemate-dark", String(dark));
+    localStorage.setItem("taskstodo-dark", String(dark));
   }, [dark]);
 
   // Load tasks from Supabase

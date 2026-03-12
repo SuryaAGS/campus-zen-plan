@@ -1,4 +1,4 @@
-const SETTINGS_KEY = "collegemate-notification-settings";
+const SETTINGS_KEY = "taskstodo-notification-settings";
 
 export interface NotificationSettings {
   enableToastReminders: boolean;

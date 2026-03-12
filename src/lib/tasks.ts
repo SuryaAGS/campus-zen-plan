@@ -1,7 +1,7 @@
 import { Task } from "@/types/task";
 
-const STORAGE_KEY = "collegemate-tasks";
-const STREAK_KEY = "collegemate-streak";
+const STORAGE_KEY = "taskstodo-tasks";
+const STREAK_KEY = "taskstodo-streak";
 
 export interface StreakData {
   current: number;

@@ -1,4 +1,4 @@
-const SNOOZE_KEY = "collegemate-snooze-timers";
+const SNOOZE_KEY = "taskstodo-snooze-timers";
 
 function getAll(): Record<string, number> {
   try {

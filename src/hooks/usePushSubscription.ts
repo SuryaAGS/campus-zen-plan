@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-const VAPID_KEY_STORAGE = "collegemate-vapid-public-key";
+const VAPID_KEY_STORAGE = "taskstodo-vapid-public-key";
 
 export function usePushSubscription() {
   const { user } = useAuth();

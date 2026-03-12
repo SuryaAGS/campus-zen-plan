@@ -9,4 +9,5 @@ export interface Task {
   priority: "High" | "Medium" | "Low";
   category: Category;
   completed: boolean;
+  note?: string | null;
 }
