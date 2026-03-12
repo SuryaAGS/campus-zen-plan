@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search, Download, Bell, MessageSquare } from "lucide-react";
+import { Plus, ClipboardCheck, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search, Download, Bell, MessageSquare } from "lucide-react";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import { useNavigate } from "react-router-dom";
-import mascot from "@/assets/mascot.png";
+import appIcon from "@/assets/app-icon.png";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -295,17 +295,17 @@ const Index = () => {
           transition={{ duration: 0.6 }}
           className="max-w-2xl"
         >
-          <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <GraduationCap size={36} className="text-primary-foreground sm:size-12" />
-            <h1 className="font-display text-3xl font-bold text-primary-foreground sm:text-5xl md:text-6xl">
-              CollegeMate AI Planner
-            </h1>
-          </div>
-          <p className="mx-auto mb-6 max-w-lg text-base text-primary-foreground/80 sm:mb-8 md:text-xl">
-            The smart AI-powered planner that automatically organizes your tasks,
-            reschedules missed work, and boosts your productivity.
-          </p>
-          <img src={mascot} alt="CollegeMate mascot" className="mx-auto mb-8 h-32 w-32 drop-shadow-2xl sm:mb-10 sm:h-44 sm:w-44 md:h-52 md:w-52" />
+           <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+             <ClipboardCheck size={36} className="text-primary-foreground sm:size-12" />
+             <h1 className="font-display text-3xl font-bold text-primary-foreground sm:text-5xl md:text-6xl">
+               Tasks To Do
+             </h1>
+           </div>
+           <p className="mx-auto mb-6 max-w-lg text-base text-primary-foreground/80 sm:mb-8 md:text-xl">
+             Your smart daily task manager with AI-powered suggestions,
+             automatic reminders, and productivity tracking.
+           </p>
+           <img src={appIcon} alt="Tasks To Do icon" className="mx-auto mb-8 h-32 w-32 drop-shadow-2xl sm:mb-10 sm:h-44 sm:w-44 md:h-52 md:w-52" />
           <div className="flex flex-col items-center gap-3 sm:flex-row">
             <button
               onClick={() => navigate("/dashboard")}
@@ -328,11 +328,11 @@ const Index = () => {
       <div ref={appRef} className="gradient-bg min-h-screen">
         <div className="container mx-auto max-w-3xl px-4 py-8">
           <motion.div initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8 text-center">
-            <div className="mb-4 flex items-center justify-center gap-3">
-              <GraduationCap size={36} className="text-primary-foreground" />
-              <h2 className="font-display text-4xl font-bold text-primary-foreground">CollegeMate</h2>
-            </div>
-            <p className="text-lg text-primary-foreground/80">Smart AI-powered student productivity</p>
+             <div className="mb-4 flex items-center justify-center gap-3">
+               <ClipboardCheck size={36} className="text-primary-foreground" />
+               <h2 className="font-display text-4xl font-bold text-primary-foreground">Tasks To Do</h2>
+             </div>
+             <p className="text-lg text-primary-foreground/80">Smart AI-powered daily productivity</p>
           </motion.div>
 
           {/* Add Task Form */}

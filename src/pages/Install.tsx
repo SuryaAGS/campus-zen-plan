@@ -49,7 +49,7 @@ const Install = () => {
           className="rounded-xl bg-card p-8 text-center shadow-elevated"
         >
           <Smartphone size={48} className="mx-auto mb-4 text-primary" />
-          <h1 className="font-display mb-2 text-2xl font-bold text-foreground">Install CollegeMate</h1>
+          <h1 className="font-display mb-2 text-2xl font-bold text-foreground">Install Tasks To Do</h1>
           <p className="mb-6 text-sm text-muted-foreground">
             Install the app on your device for quick access, offline support, and a native app experience.
           </p>

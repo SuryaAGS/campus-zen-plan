@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
-  GraduationCap, Moon, Sun, LogOut, UserCircle, CalendarDays, 
+  ClipboardCheck, Moon, Sun, LogOut, UserCircle, CalendarDays, 
   Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
-import mascot from "@/assets/mascot.png";
+import appIcon from "@/assets/app-icon.png";
 import { Task, Category } from "@/types/task";
 import { refreshStreak, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
@@ -189,7 +189,7 @@ const Dashboard = () => {
           className="mb-8 text-center"
         >
           <div className="mb-4 flex items-center justify-center gap-3">
-            <img src={mascot} alt="Mascot" className="h-16 w-16 drop-shadow-lg" />
+            <img src={appIcon} alt="Tasks To Do" className="h-16 w-16 drop-shadow-lg" />
             <div>
               <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
                 Welcome back{profile.display_name ? `, ${profile.display_name.split(" ")[0]}` : ""}!

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, LogIn, UserPlus, KeyRound } from "lucide-react";
+import { ClipboardCheck, LogIn, UserPlus, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
@@ -52,8 +52,8 @@ export default function Auth() {
         className="w-full max-w-md rounded-xl bg-card p-8 shadow-elevated"
       >
         <div className="mb-6 flex items-center justify-center gap-2">
-          <GraduationCap size={32} className="text-primary" />
-          <h1 className="font-display text-2xl font-bold text-card-foreground">CollegeMate</h1>
+          <ClipboardCheck size={32} className="text-primary" />
+          <h1 className="font-display text-2xl font-bold text-card-foreground">Tasks To Do</h1>
         </div>
 
         <h2 className="mb-6 text-center font-display text-xl font-semibold text-card-foreground">
@@ -80,7 +80,7 @@ export default function Auth() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@university.edu"
+              placeholder="you@email.com"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               required
             />

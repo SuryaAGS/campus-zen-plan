@@ -67,7 +67,7 @@ export default function FeedbackDialog() {
         <div className="space-y-4 pt-2">
           <div>
             <label className="mb-2 block text-sm font-medium text-foreground">
-              How would you rate CollegeMate?
+              How would you rate Tasks To Do?
             </label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (

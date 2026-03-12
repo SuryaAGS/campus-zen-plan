@@ -20,9 +20,9 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png"],
       manifest: {
-        name: "CollegeMate AI Planner",
-        short_name: "CollegeMate",
-        description: "Smart AI-powered student productivity planner",
+        name: "Tasks To Do",
+        short_name: "Tasks To Do",
+        description: "Smart AI-powered task manager for daily productivity",
         theme_color: "#667eea",
         background_color: "#f0f2f8",
         display: "standalone",

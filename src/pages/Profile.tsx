@@ -113,7 +113,7 @@ export default function Profile() {
           onClick={() => navigate("/")}
           className="mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground"
         >
-          <ArrowLeft size={16} /> Back to Planner
+          <ArrowLeft size={16} /> Back to Tasks
         </button>
 
         <motion.div
