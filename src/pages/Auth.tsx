@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, LogIn, UserPlus, KeyRound } from "lucide-react";
+import { ClipboardCheck, LogIn, UserPlus, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
