@@ -213,6 +213,7 @@ const Index = () => {
     }
   };
 
+  const { suggestion: aiSuggestion, loading: aiLoading, refresh: refreshAi } = useAiSuggestion(tasks.length);
   const reminders = useTaskReminders(tasks);
   const filtered = (filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory))
     .filter((t) => !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()));
