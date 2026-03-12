@@ -161,6 +161,18 @@ const AddTask = () => {
                 </div>
               </div>
 
+              {/* Note */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Note (optional)</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Add any details or reminders..."
+                  rows={2}
+                  className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                />
+              </div>
+
               {/* Submit */}
               <button
                 onClick={addTask}

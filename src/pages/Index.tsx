@@ -92,6 +92,7 @@ const Index = () => {
         priority: (t.priority as Task["priority"]) || "Medium",
         category: (t.category as Category) || "Other",
         completed: !!t.completed,
+        note: (t as any).note || null,
       }));
 
       // Auto-reschedule overdue tasks (fire-and-forget, don't block rendering)
