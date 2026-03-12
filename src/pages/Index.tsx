@@ -463,7 +463,7 @@ const Index = () => {
           <div className="space-y-4">
             <StreakBadge streak={streak.current} />
             <ProgressBar completed={completed.length} total={tasks.length} />
-            <AiSuggestion tip={getAiSuggestion(tasks)} />
+            <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
           </div>
         </div>
       </div>
