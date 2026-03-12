@@ -38,7 +38,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
 
   const handleSave = () => {
     if (!title || !date) return;
-    onSave(task.id, { title, date, time: time || null, priority, category });
+    onSave(task.id, { title, date, time: time || null, priority, category, note: note || null });
     setOpen(false);
   };
 
