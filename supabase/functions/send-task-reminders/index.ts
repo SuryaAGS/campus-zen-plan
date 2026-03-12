@@ -138,6 +138,16 @@ Deno.serve(async (req) => {
         }
       }
 
+      // 2-minute warning
+      if (userTasks.dueTwoMin.length > 0) {
+        for (const task of userTasks.dueTwoMin) {
+          notifications.push({
+            title: "⚡ 2 Minutes Left",
+            body: `"${task.title}" starts at ${task.time} — 2 minutes!`,
+          });
+        }
+      }
+
       // Exact time notifications
       if (userTasks.dueNow.length > 0) {
         for (const task of userTasks.dueNow) {
