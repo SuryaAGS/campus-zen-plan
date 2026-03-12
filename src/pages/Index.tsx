@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Plus, GraduationCap, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search, Download, Bell, MessageSquare } from "lucide-react";
+import { Plus, ClipboardCheck, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search, Download, Bell, MessageSquare } from "lucide-react";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import { useNavigate } from "react-router-dom";
 import mascot from "@/assets/mascot.png";
