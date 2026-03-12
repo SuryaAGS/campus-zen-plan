@@ -4,7 +4,7 @@ import confetti from "canvas-confetti";
 import { Plus, ClipboardCheck, ArrowDown, Filter, Moon, Sun, LogOut, UserCircle, Settings, CalendarDays, ArrowUpDown, Search, Download, Bell, MessageSquare } from "lucide-react";
 import FeedbackDialog from "@/components/FeedbackDialog";
 import { useNavigate } from "react-router-dom";
-import mascot from "@/assets/mascot.png";
+import appIcon from "@/assets/app-icon.png";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryColor } from "@/lib/categoryColors";
