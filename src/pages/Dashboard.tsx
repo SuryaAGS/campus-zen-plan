@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
-  GraduationCap, Moon, Sun, LogOut, UserCircle, CalendarDays, 
+  ClipboardCheck, Moon, Sun, LogOut, UserCircle, CalendarDays, 
   Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
