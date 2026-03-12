@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, KeyRound } from "lucide-react";
+import { ClipboardCheck, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -57,7 +57,7 @@ export default function ResetPassword() {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md rounded-xl bg-card p-8 shadow-elevated text-center"
         >
-          <GraduationCap size={32} className="mx-auto text-primary mb-4" />
+          <ClipboardCheck size={32} className="mx-auto text-primary mb-4" />
           <h2 className="font-display text-xl font-semibold text-card-foreground mb-2">Invalid Link</h2>
           <p className="text-sm text-muted-foreground mb-4">
             This password reset link is invalid or has expired.
@@ -81,8 +81,8 @@ export default function ResetPassword() {
         className="w-full max-w-md rounded-xl bg-card p-8 shadow-elevated"
       >
         <div className="mb-6 flex items-center justify-center gap-2">
-          <GraduationCap size={32} className="text-primary" />
-          <h1 className="font-display text-2xl font-bold text-card-foreground">CollegeMate</h1>
+          <ClipboardCheck size={32} className="text-primary" />
+          <h1 className="font-display text-2xl font-bold text-card-foreground">Tasks To Do</h1>
         </div>
 
         <h2 className="mb-6 text-center font-display text-xl font-semibold text-card-foreground">
