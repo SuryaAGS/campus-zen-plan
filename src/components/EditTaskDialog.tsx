@@ -111,6 +111,16 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
               </select>
             </div>
           </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Note (optional)</label>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Add a quick note..."
+              rows={2}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+            />
+          </div>
           <button
             onClick={handleSave}
             className="gradient-bg w-full rounded-md px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110"

@@ -209,7 +209,7 @@ export function useTaskReminders(tasks: Task[]) {
     const newDueNow = dueNow.filter((t) => !alreadyNotified.has(t.id) && !isSnoozed(`toast-time-${t.id}`));
     for (const task of newDueNow) {
       const msg = `"${task.title}" is due NOW!`;
-      if (settings.enableToastReminders) showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`);
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⏰ ${msg}`, `toast-time-${task.id}`, true);
       if (settings.enablePushNotifications) sendBrowserNotification("⏰ Task Due Now", msg);
     }
     if (newDueNow.length > 0) markTimeNotified(newDueNow.map((t) => t.id), TIME_NOTIFIED_KEY);
