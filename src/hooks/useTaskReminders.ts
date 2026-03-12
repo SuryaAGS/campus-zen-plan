@@ -149,7 +149,7 @@ export function useTaskReminders(tasks: Task[]) {
     const settings = getNotificationSettings();
     if (!settings.enableDueToday) return;
 
-    const { dueNow, dueFiveMin } = getTasksDueSoonByTime(currentTasks);
+    const { dueNow, dueTwoMin, dueFiveMin } = getTasksDueSoonByTime(currentTasks);
 
     // 5-minute warning
     const already5min = getTimeNotifiedIds(TIME_5MIN_NOTIFIED_KEY);
@@ -160,6 +160,16 @@ export function useTaskReminders(tasks: Task[]) {
       if (settings.enablePushNotifications) sendBrowserNotification("⏳ 5 Minutes Left", msg);
     }
     if (new5min.length > 0) markTimeNotified(new5min.map((t) => t.id), TIME_5MIN_NOTIFIED_KEY);
+
+    // 2-minute warning
+    const already2min = getTimeNotifiedIds(TIME_2MIN_NOTIFIED_KEY);
+    const new2min = dueTwoMin.filter((t) => !already2min.has(t.id) && !isSnoozed(`toast-time-2min-${t.id}`));
+    for (const task of new2min) {
+      const msg = `"${task.title}" starts at ${task.time} — 2 minutes!`;
+      if (settings.enableToastReminders) showSnoozeableToast("warning", `⚡ ${msg}`, `toast-time-2min-${task.id}`);
+      if (settings.enablePushNotifications) sendBrowserNotification("⚡ 2 Minutes Left", msg);
+    }
+    if (new2min.length > 0) markTimeNotified(new2min.map((t) => t.id), TIME_2MIN_NOTIFIED_KEY);
 
     // Exact time notification
     const alreadyNotified = getTimeNotifiedIds(TIME_NOTIFIED_KEY);
