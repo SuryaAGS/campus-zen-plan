@@ -12,6 +12,8 @@ import { refreshStreak, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import StreakBadge from "@/components/StreakBadge";
+import AiSuggestion from "@/components/AiSuggestion";
+import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
