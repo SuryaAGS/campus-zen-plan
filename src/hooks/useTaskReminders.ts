@@ -127,7 +127,8 @@ function markTimeNotified(ids: string[], key = TIME_NOTIFIED_KEY) {
   sessionStorage.setItem(key, JSON.stringify([...existing]));
 }
 
-function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string) {
+function showSnoozeableToast(type: "warning" | "info", message: string, snoozeKey: string, withAlarm = false) {
+  if (withAlarm) playAlarmSound();
   toast[type](message, {
     duration: 10000,
     action: {
