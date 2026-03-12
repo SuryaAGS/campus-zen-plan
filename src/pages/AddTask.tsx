@@ -36,6 +36,7 @@ const AddTask = () => {
         time: time || null,
         priority,
         category,
+        note: note || null,
       } as any);
       if (error) {
         toast.error("Failed to add task");
