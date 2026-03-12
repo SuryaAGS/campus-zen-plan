@@ -50,7 +50,11 @@ function getTasksDueSoonByTime(tasks: Task[]) {
 
 function requestNotificationPermission() {
   if ("Notification" in window && Notification.permission === "default") {
-    Notification.requestPermission();
+    Notification.requestPermission().then((result) => {
+      if (result === "granted") {
+        toast.success("🔔 Notifications enabled! You'll get alerts for upcoming tasks.");
+      }
+    });
   }
 }
 
