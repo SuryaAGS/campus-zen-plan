@@ -194,11 +194,20 @@ const MyTasks = () => {
     } catch {}
   };
 
-  const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string }) => {
+  const editTask = async (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean }) => {
     try {
       const { error } = await supabase.from("tasks").update(updates as any).eq("id", id);
       if (error) { toast.error("Failed to update task"); return; }
       toast.success("Task updated");
+      fetchTasks();
+    } catch {}
+  };
+
+  const toggleAlarm = async (id: string, enabled: boolean) => {
+    try {
+      const { error } = await supabase.from("tasks").update({ alarm_enabled: enabled } as any).eq("id", id);
+      if (error) { toast.error("Failed to update alarm"); return; }
+      toast.success(enabled ? "🔔 Alarm enabled" : "🔕 Alarm disabled");
       fetchTasks();
     } catch {}
   };
