@@ -48,9 +48,8 @@ Deno.serve(async (req) => {
     // Get all incomplete tasks due today or tomorrow
     const { data: tasks, error: tasksError } = await supabase
       .from("tasks")
-      .select("id, user_id, title, date, time, priority")
-      .eq("completed", false)
-      .in("date", [todayStr, tomorrowStr]);
+      .select("id, user_id, title, date, time, priority, alarm_enabled")
+      .eq("completed", false);
 
     if (tasksError) throw tasksError;
 
@@ -70,11 +69,14 @@ Deno.serve(async (req) => {
       dueNow: typeof tasks;
       dueTwoMin: typeof tasks;
       dueFiveMin: typeof tasks;
+      overdueRepeat: typeof tasks;
     }> = {};
 
     for (const task of tasks) {
+      if ((task as any).alarm_enabled === false) continue; // Skip alarm-disabled tasks
+
       if (!tasksByUser[task.user_id]) {
-        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueNow: [], dueTwoMin: [], dueFiveMin: [] };
+        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueNow: [], dueTwoMin: [], dueFiveMin: [], overdueRepeat: [] };
       }
 
       if (task.time && task.date === todayStr) {
@@ -93,12 +95,20 @@ Deno.serve(async (req) => {
             tasksByUser[task.user_id].dueFiveMin.push(task);
             continue;
           }
+          // Overdue: repeat every 10 minutes
+          if (diff < -ONE_MIN) {
+            const minutesOverdue = Math.abs(diff) / ONE_MIN;
+            if (minutesOverdue % 10 < 1.5) {
+              tasksByUser[task.user_id].overdueRepeat.push(task);
+              continue;
+            }
+          }
         }
       }
 
       if (task.date === todayStr) {
         tasksByUser[task.user_id].dueToday.push(task);
-      } else {
+      } else if (task.date === tomorrowStr) {
         tasksByUser[task.user_id].dueTomorrow.push(task);
       }
     }
@@ -154,6 +164,16 @@ Deno.serve(async (req) => {
           notifications.push({
             title: "⏰ Task Due Now",
             body: `"${task.title}" is due NOW!`,
+          });
+        }
+      }
+
+      // Repeat alarm for overdue uncompleted tasks (every 10 min)
+      if (userTasks.overdueRepeat.length > 0) {
+        for (const task of userTasks.overdueRepeat) {
+          notifications.push({
+            title: "🔁 Task Overdue - Not Completed",
+            body: `"${task.title}" was due at ${task.time} and is still not done!`,
           });
         }
       }

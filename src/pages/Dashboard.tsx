@@ -71,6 +71,7 @@ const Dashboard = () => {
       priority: (t.priority as Task["priority"]) || "Medium",
       category: (t.category as Category) || "Other",
       completed: !!t.completed,
+      alarm_enabled: (t as any).alarm_enabled !== false,
       missedCount: (t as any).missed_count ?? 0,
     }));
 

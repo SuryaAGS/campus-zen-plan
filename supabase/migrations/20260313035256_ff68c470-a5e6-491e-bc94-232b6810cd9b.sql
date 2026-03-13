@@ -1,0 +1,1 @@
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS alarm_enabled boolean NOT NULL DEFAULT true;

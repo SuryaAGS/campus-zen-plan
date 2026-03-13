@@ -112,6 +112,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          alarm_enabled: boolean
           category: string
           completed: boolean
           created_at: string
@@ -126,6 +127,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          alarm_enabled?: boolean
           category?: string
           completed?: boolean
           created_at?: string
@@ -140,6 +142,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          alarm_enabled?: boolean
           category?: string
           completed?: boolean
           created_at?: string
