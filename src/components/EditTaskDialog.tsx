@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Task } from "@/types/task";
-import { Pencil } from "lucide-react";
+import { Pencil, Bell, BellOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
 interface EditTaskDialogProps {
   task: Task;
   allCategories: string[];
-  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null }) => void;
+  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean }) => void;
 }
 
 const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) => {
@@ -23,6 +23,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
   const [priority, setPriority] = useState<string>(task.priority);
   const [category, setCategory] = useState<string>(task.category);
   const [note, setNote] = useState(task.note || "");
+  const [alarmEnabled, setAlarmEnabled] = useState(task.alarm_enabled !== false);
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
@@ -32,13 +33,14 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
       setPriority(task.priority);
       setCategory(task.category);
       setNote(task.note || "");
+      setAlarmEnabled(task.alarm_enabled !== false);
     }
     setOpen(isOpen);
   };
 
   const handleSave = () => {
     if (!title || !date) return;
-    onSave(task.id, { title, date, time: time || null, priority, category, note: note || null });
+    onSave(task.id, { title, date, time: time || null, priority, category, note: note || null, alarm_enabled: alarmEnabled });
     setOpen(false);
   };
 
@@ -85,6 +87,30 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
               />
             </div>
           </div>
+
+          {/* Alarm Toggle */}
+          {time && (
+            <div className="flex items-center justify-between rounded-lg border border-input bg-background px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                {alarmEnabled ? <Bell size={16} className="text-primary" /> : <BellOff size={16} className="text-muted-foreground" />}
+                <span className="text-sm font-medium text-foreground">Alarm</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAlarmEnabled(!alarmEnabled)}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+                  alarmEnabled ? "bg-primary" : "bg-input"
+                }`}
+              >
+                <span
+                  className={`pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg transition-transform ${
+                    alarmEnabled ? "translate-x-4" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-muted-foreground">Priority</label>

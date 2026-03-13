@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, ArrowLeft, Eye } from "lucide-react";
+import { Plus, ArrowLeft, Eye, Bell, BellOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Task } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 const AddTask = () => {
   const { user } = useAuth();
@@ -20,6 +20,7 @@ const AddTask = () => {
   const { allCategoryNames } = useCategories();
   const [adding, setAdding] = useState(false);
   const [note, setNote] = useState("");
+  const [alarmEnabled, setAlarmEnabled] = useState(true);
 
   const addTask = async () => {
     if (!title || !date || !user) {
@@ -37,6 +38,7 @@ const AddTask = () => {
         priority,
         category,
         note: note || null,
+        alarm_enabled: alarmEnabled,
       } as any);
       if (error) {
         toast.error("Failed to add task");
@@ -47,6 +49,7 @@ const AddTask = () => {
       setDate("");
       setTime("");
       setNote("");
+      setAlarmEnabled(true);
     } catch {
       toast.error("Failed to add task");
     } finally {
@@ -132,6 +135,36 @@ const AddTask = () => {
                   />
                 </div>
               </div>
+
+              {/* Alarm Toggle */}
+              {time && (
+                <div className="flex items-center justify-between rounded-xl border border-input bg-background px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${alarmEnabled ? "bg-primary/10" : "bg-muted"}`}>
+                      {alarmEnabled ? <Bell size={18} className="text-primary" /> : <BellOff size={18} className="text-muted-foreground" />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Alarm & Reminder</p>
+                      <p className="text-xs text-muted-foreground">
+                        {alarmEnabled ? "You'll be notified at the scheduled time" : "No alarm for this task"}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAlarmEnabled(!alarmEnabled)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+                      alarmEnabled ? "bg-primary" : "bg-input"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg transition-transform ${
+                        alarmEnabled ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              )}
 
               {/* Priority & Category Row */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

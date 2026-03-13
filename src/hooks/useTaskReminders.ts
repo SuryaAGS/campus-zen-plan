@@ -76,12 +76,8 @@ async function sendBrowserNotification(title: string, body: string, tag?: string
       reg.showNotification(title, {
         body,
         icon: "/pwa-192x192.png",
-        badge: "/pwa-192x192.png",
-        vibrate: [200, 100, 200, 100, 200],
-        requireInteraction: true,
         tag: tag || `task-${Date.now()}`,
-        renotify: true,
-      });
+      } as any);
     } else {
       new Notification(title, { body, icon: "/pwa-192x192.png" });
     }
