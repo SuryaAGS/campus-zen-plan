@@ -69,11 +69,14 @@ Deno.serve(async (req) => {
       dueNow: typeof tasks;
       dueTwoMin: typeof tasks;
       dueFiveMin: typeof tasks;
+      overdueRepeat: typeof tasks;
     }> = {};
 
     for (const task of tasks) {
+      if ((task as any).alarm_enabled === false) continue; // Skip alarm-disabled tasks
+
       if (!tasksByUser[task.user_id]) {
-        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueNow: [], dueTwoMin: [], dueFiveMin: [] };
+        tasksByUser[task.user_id] = { dueToday: [], dueTomorrow: [], dueNow: [], dueTwoMin: [], dueFiveMin: [], overdueRepeat: [] };
       }
 
       if (task.time && task.date === todayStr) {
@@ -92,12 +95,20 @@ Deno.serve(async (req) => {
             tasksByUser[task.user_id].dueFiveMin.push(task);
             continue;
           }
+          // Overdue: repeat every 10 minutes
+          if (diff < -ONE_MIN) {
+            const minutesOverdue = Math.abs(diff) / ONE_MIN;
+            if (minutesOverdue % 10 < 1.5) {
+              tasksByUser[task.user_id].overdueRepeat.push(task);
+              continue;
+            }
+          }
         }
       }
 
       if (task.date === todayStr) {
         tasksByUser[task.user_id].dueToday.push(task);
-      } else {
+      } else if (task.date === tomorrowStr) {
         tasksByUser[task.user_id].dueTomorrow.push(task);
       }
     }
