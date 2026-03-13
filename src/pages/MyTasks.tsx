@@ -394,6 +394,7 @@ const MyTasks = () => {
                 onComplete={completeTask}
                 onEdit={editTask}
                 onDelete={deleteTask}
+                onToggleAlarm={toggleAlarm}
                 allCategories={allCategoryNames}
               />
             ))}
