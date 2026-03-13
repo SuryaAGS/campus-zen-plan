@@ -10,4 +10,5 @@ export interface Task {
   category: Category;
   completed: boolean;
   note?: string | null;
+  alarm_enabled?: boolean;
 }
