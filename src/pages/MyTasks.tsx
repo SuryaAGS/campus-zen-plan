@@ -94,6 +94,7 @@ const MyTasks = () => {
         category: (t.category as Category) || "Other",
         completed: !!t.completed,
         note: (t as any).note || null,
+        alarm_enabled: (t as any).alarm_enabled !== false,
         missedCount: (t as any).missed_count ?? 0,
       }));
 
