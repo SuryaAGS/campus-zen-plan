@@ -168,6 +168,16 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Repeat alarm for overdue uncompleted tasks (every 10 min)
+      if (userTasks.overdueRepeat.length > 0) {
+        for (const task of userTasks.overdueRepeat) {
+          notifications.push({
+            title: "🔁 Task Overdue - Not Completed",
+            body: `"${task.title}" was due at ${task.time} and is still not done!`,
+          });
+        }
+      }
+
       // Date-based notifications
       if (userTasks.dueToday.length > 0) {
         notifications.push({
