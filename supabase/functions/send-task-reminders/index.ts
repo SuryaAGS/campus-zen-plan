@@ -48,9 +48,8 @@ Deno.serve(async (req) => {
     // Get all incomplete tasks due today or tomorrow
     const { data: tasks, error: tasksError } = await supabase
       .from("tasks")
-      .select("id, user_id, title, date, time, priority")
-      .eq("completed", false)
-      .in("date", [todayStr, tomorrowStr]);
+      .select("id, user_id, title, date, time, priority, alarm_enabled")
+      .eq("completed", false);
 
     if (tasksError) throw tasksError;
 
