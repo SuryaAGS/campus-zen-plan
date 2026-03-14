@@ -214,7 +214,19 @@ const MyTasks = () => {
   };
 
   const reminders = useTaskReminders(tasks);
-  const filtered = (filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory))
+  const urlFilter = searchParams.get("filter");
+  const today = new Date().toISOString().split("T")[0];
+
+  const applyUrlFilter = (list: Task[]) => {
+    if (urlFilter === "pending") return list.filter((t) => !t.completed);
+    if (urlFilter === "completed") return list.filter((t) => t.completed);
+    if (urlFilter === "today") return list.filter((t) => t.date === today && !t.completed);
+    if (urlFilter === "high") return list.filter((t) => t.priority === "High" && !t.completed);
+    return list;
+  };
+
+  const baseFiltered = applyUrlFilter(tasks);
+  const filtered = (filterCategory === "All" ? baseFiltered : baseFiltered.filter((t) => t.category === filterCategory))
     .filter((t) => !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const priorityOrder: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
@@ -228,7 +240,7 @@ const MyTasks = () => {
 
   const pending = sortTasks(filtered.filter((t) => !t.completed));
   const completed = sortTasks(filtered.filter((t) => t.completed));
-  const progressPercent = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
+  const progressPercent = tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
