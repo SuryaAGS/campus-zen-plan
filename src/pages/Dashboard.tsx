@@ -17,6 +17,8 @@ import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import SmartRoutine from "@/components/SmartRoutine";
+import DailyProductivityScore from "@/components/DailyProductivityScore";
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -336,33 +338,41 @@ const Dashboard = () => {
           </Card>
         </motion.div>
 
-        {/* AI Suggestion */}
+        {/* Daily Productivity Score */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.33 }}
+          className="mb-8"
+        >
+          <DailyProductivityScore
+            completedToday={tasks.filter(t => t.completed && t.date === today).length}
+            totalToday={tasks.filter(t => t.date === today).length}
+            streak={streak.current}
+          />
+        </motion.div>
+
+        {/* Smart Routine */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
           className="mb-8"
         >
-          <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
+          <SmartRoutine
+            existingTasks={tasks.map(t => ({ title: t.title, date: t.date, time: t.time, completed: t.completed }))}
+            onTaskAdded={fetchTasks}
+          />
         </motion.div>
 
+        {/* AI Suggestion */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <Card className="border-none bg-gradient-to-br from-accent to-accent/50 shadow-elevated">
-            <CardContent className="flex items-center gap-4 p-5">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-foreground/10">
-                <Zap className="h-7 w-7 text-accent-foreground" />
-              </div>
-              <div>
-                <p className="text-3xl font-bold text-accent-foreground">{streak.current}</p>
-                <p className="text-sm text-accent-foreground/80">Day Streak 🔥</p>
-              </div>
-            </CardContent>
-          </Card>
+          <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
         </motion.div>
 
         {/* AI Rescheduled Tasks */}

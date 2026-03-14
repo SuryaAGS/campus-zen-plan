@@ -22,6 +22,31 @@ const AddTask = () => {
   const [note, setNote] = useState("");
   const [alarmEnabled, setAlarmEnabled] = useState(true);
 
+  const findNextFreeSlot = async (): Promise<string> => {
+    const today = new Date().toISOString().split("T")[0];
+    const targetDate = date || today;
+    const { data } = await supabase
+      .from("tasks")
+      .select("time")
+      .eq("user_id", user!.id)
+      .eq("date", targetDate)
+      .eq("completed", false);
+
+    const taken = (data || []).map(t => t.time).filter(Boolean) as string[];
+    const now = new Date();
+    let minutes = targetDate === today
+      ? Math.ceil((now.getHours() * 60 + now.getMinutes() + 15) / 30) * 30
+      : 8 * 60; // start at 8 AM for future dates
+
+    for (let i = 0; i < 48; i++) {
+      if (minutes >= 1380) break; // stop at 23:00
+      const slot = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+      if (!taken.includes(slot)) return slot;
+      minutes += 30;
+    }
+    return "09:00";
+  };
+
   const addTask = async () => {
     if (!title || !date || !user) {
       if (!title) toast.error("Please enter a task title");
@@ -30,11 +55,18 @@ const AddTask = () => {
     }
     setAdding(true);
     try {
+      // Auto-schedule: if no time selected, find the nearest free slot
+      let taskTime = time || null;
+      if (!taskTime) {
+        taskTime = await findNextFreeSlot();
+        toast.info(`⏰ Auto-scheduled at ${taskTime}`);
+      }
+
       const { error } = await supabase.from("tasks").insert({
         user_id: user.id,
         title,
         date,
-        time: time || null,
+        time: taskTime,
         priority,
         category,
         note: note || null,
