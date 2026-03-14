@@ -17,6 +17,8 @@ import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import SmartRoutine from "@/components/SmartRoutine";
+import DailyProductivityScore from "@/components/DailyProductivityScore";
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
