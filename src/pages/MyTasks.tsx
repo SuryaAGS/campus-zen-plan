@@ -266,6 +266,24 @@ const MyTasks = () => {
       </div>
 
       <div className="container mx-auto max-w-3xl px-4 py-6">
+        {/* Active Filter Banner */}
+        {urlFilter && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 flex items-center justify-between rounded-lg bg-primary/10 px-4 py-2"
+          >
+            <span className="text-sm font-medium text-primary">
+              Showing: {urlFilter === "pending" ? "Pending Tasks" : urlFilter === "completed" ? "Completed Tasks" : urlFilter === "today" ? "Due Today" : "High Priority"}
+            </span>
+            <button
+              onClick={() => navigate("/my-tasks")}
+              className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/30"
+            >
+              <X size={12} /> Clear
+            </button>
+          </motion.div>
+        )}
         {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
