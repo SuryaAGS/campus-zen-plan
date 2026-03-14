@@ -22,6 +22,7 @@ import { Progress } from "@/components/ui/progress";
 const MyTasks = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<"date" | "priority" | "category">("date");
