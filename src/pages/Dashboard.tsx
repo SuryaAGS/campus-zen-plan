@@ -209,8 +209,8 @@ const Dashboard = () => {
           animate="visible"
           className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4"
         >
-          <motion.div variants={itemVariants}>
-            <Card className="border-none bg-gradient-to-br from-primary/20 to-primary/5 shadow-card">
+          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
+            <Card className="cursor-pointer border-none bg-gradient-to-br from-primary/20 to-primary/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=pending")}>
               <CardContent className="p-4 text-center">
                 <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
                   <ListTodo className="h-5 w-5 text-primary" />
@@ -221,8 +221,8 @@ const Dashboard = () => {
             </Card>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <Card className="border-none bg-gradient-to-br from-green-500/20 to-green-500/5 shadow-card">
+          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
+            <Card className="cursor-pointer border-none bg-gradient-to-br from-green-500/20 to-green-500/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=completed")}>
               <CardContent className="p-4 text-center">
                 <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20">
                   <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -233,8 +233,8 @@ const Dashboard = () => {
             </Card>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <Card className="border-none bg-gradient-to-br from-orange-500/20 to-orange-500/5 shadow-card">
+          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
+            <Card className="cursor-pointer border-none bg-gradient-to-br from-orange-500/20 to-orange-500/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=today")}>
               <CardContent className="p-4 text-center">
                 <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/20">
                   <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
@@ -245,8 +245,8 @@ const Dashboard = () => {
             </Card>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <Card className="border-none bg-gradient-to-br from-red-500/20 to-red-500/5 shadow-card">
+          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
+            <Card className="cursor-pointer border-none bg-gradient-to-br from-red-500/20 to-red-500/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=high")}>
               <CardContent className="p-4 text-center">
                 <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-500/20">
                   <Target className="h-5 w-5 text-red-600 dark:text-red-400" />

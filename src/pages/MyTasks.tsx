@@ -5,7 +5,7 @@ import {
   ArrowLeft, Filter, Settings, ArrowUpDown, Search,
   Plus, ListTodo, CheckCircle2, X
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryColor } from "@/lib/categoryColors";
@@ -22,6 +22,7 @@ import { Progress } from "@/components/ui/progress";
 const MyTasks = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filterCategory, setFilterCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<"date" | "priority" | "category">("date");
@@ -213,7 +214,19 @@ const MyTasks = () => {
   };
 
   const reminders = useTaskReminders(tasks);
-  const filtered = (filterCategory === "All" ? tasks : tasks.filter((t) => t.category === filterCategory))
+  const urlFilter = searchParams.get("filter");
+  const today = new Date().toISOString().split("T")[0];
+
+  const applyUrlFilter = (list: Task[]) => {
+    if (urlFilter === "pending") return list.filter((t) => !t.completed);
+    if (urlFilter === "completed") return list.filter((t) => t.completed);
+    if (urlFilter === "today") return list.filter((t) => t.date === today && !t.completed);
+    if (urlFilter === "high") return list.filter((t) => t.priority === "High" && !t.completed);
+    return list;
+  };
+
+  const baseFiltered = applyUrlFilter(tasks);
+  const filtered = (filterCategory === "All" ? baseFiltered : baseFiltered.filter((t) => t.category === filterCategory))
     .filter((t) => !searchQuery || t.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const priorityOrder: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
@@ -227,7 +240,7 @@ const MyTasks = () => {
 
   const pending = sortTasks(filtered.filter((t) => !t.completed));
   const completed = sortTasks(filtered.filter((t) => t.completed));
-  const progressPercent = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
+  const progressPercent = tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
@@ -253,6 +266,24 @@ const MyTasks = () => {
       </div>
 
       <div className="container mx-auto max-w-3xl px-4 py-6">
+        {/* Active Filter Banner */}
+        {urlFilter && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 flex items-center justify-between rounded-lg bg-primary/10 px-4 py-2"
+          >
+            <span className="text-sm font-medium text-primary">
+              Showing: {urlFilter === "pending" ? "Pending Tasks" : urlFilter === "completed" ? "Completed Tasks" : urlFilter === "today" ? "Due Today" : "High Priority"}
+            </span>
+            <button
+              onClick={() => navigate("/my-tasks")}
+              className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/30"
+            >
+              <X size={12} /> Clear
+            </button>
+          </motion.div>
+        )}
         {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
