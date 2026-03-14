@@ -5,7 +5,7 @@ import {
   ArrowLeft, Filter, Settings, ArrowUpDown, Search,
   Plus, ListTodo, CheckCircle2, X
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Task, Category } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { getCategoryColor } from "@/lib/categoryColors";
