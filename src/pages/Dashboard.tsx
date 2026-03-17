@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { 
   ClipboardCheck, Moon, Sun, LogOut, UserCircle, CalendarDays, 
-  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3
+  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3, StickyNote, Save, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
@@ -15,7 +15,6 @@ import StreakBadge from "@/components/StreakBadge";
 import AiSuggestion from "@/components/AiSuggestion";
 import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { Progress } from "@/components/ui/progress";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import SmartRoutine from "@/components/SmartRoutine";
 import DailyProductivityScore from "@/components/DailyProductivityScore";
@@ -29,6 +28,30 @@ const Dashboard = () => {
   const [dark, setDark] = useState(() => localStorage.getItem("taskstodo-dark") === "true");
   const [profile, setProfile] = useState<{ display_name: string | null; avatar_url: string | null }>({ display_name: null, avatar_url: null });
   const [rescheduledTasks, setRescheduledTasks] = useState<Array<{ id: string; title: string; date: string; time: string | null; missedCount: number }>>([]);
+
+  // Quick Notes state
+  const [quickNotes, setQuickNotes] = useState<Array<{ id: string; text: string; created: string }>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("taskstodo-quick-notes") || "[]");
+    } catch { return []; }
+  });
+  const [newNote, setNewNote] = useState("");
+
+  const saveNotes = (notes: typeof quickNotes) => {
+    setQuickNotes(notes);
+    localStorage.setItem("taskstodo-quick-notes", JSON.stringify(notes));
+  };
+
+  const addNote = () => {
+    if (!newNote.trim()) return;
+    const note = { id: crypto.randomUUID(), text: newNote.trim(), created: new Date().toISOString() };
+    saveNotes([note, ...quickNotes]);
+    setNewNote("");
+  };
+
+  const deleteNote = (id: string) => {
+    saveNotes(quickNotes.filter(n => n.id !== id));
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -88,7 +111,6 @@ const Dashboard = () => {
     fetchTasks();
   }, [fetchTasks]);
 
-
   const { suggestion: aiSuggestion, loading: aiLoading, refresh: refreshAi } = useAiSuggestion(tasks.length);
 
   const pending = tasks.filter((t) => !t.completed);
@@ -122,7 +144,7 @@ const Dashboard = () => {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
+      transition: { staggerChildren: 0.08 }
     }
   };
 
@@ -132,11 +154,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div className="app-gradient-bg">
       {/* Profile - Left */}
       <button
         onClick={() => navigate("/profile")}
-        className="fixed left-3 top-3 z-50 flex items-center gap-1.5 rounded-full bg-card px-2 py-1 shadow-elevated transition-all hover:scale-105"
+        className="fixed left-3 top-3 z-50 flex items-center gap-1.5 glass rounded-full px-3 py-1.5 transition-all hover:scale-105"
         aria-label="Profile"
       >
         {profile.avatar_url ? (
@@ -156,28 +178,28 @@ const Dashboard = () => {
         <FeedbackDialog />
         <button
           onClick={() => navigate("/notifications")}
-          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
           aria-label="Notification settings"
         >
           <Bell size={18} className="text-foreground sm:size-5" />
         </button>
         <button
           onClick={() => navigate("/calendar")}
-          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
           aria-label="Calendar view"
         >
           <CalendarDays size={18} className="text-foreground sm:size-5" />
         </button>
         <button
           onClick={() => setDark((d) => !d)}
-          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
           aria-label="Toggle dark mode"
         >
           {dark ? <Sun size={18} className="text-foreground sm:size-5" /> : <Moon size={18} className="text-foreground sm:size-5" />}
         </button>
         <button
           onClick={signOut}
-          className="rounded-full bg-card p-2 shadow-elevated transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
           aria-label="Sign out"
         >
           <LogOut size={18} className="text-foreground sm:size-5" />
@@ -209,53 +231,25 @@ const Dashboard = () => {
           animate="visible"
           className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4"
         >
-          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
-            <Card className="cursor-pointer border-none bg-gradient-to-br from-primary/20 to-primary/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=pending")}>
-              <CardContent className="p-4 text-center">
-                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
-                  <ListTodo className="h-5 w-5 text-primary" />
+          {[
+            { label: "Pending Tasks", value: pending.length, icon: ListTodo, gradient: "from-primary/20 to-primary/5", iconBg: "bg-primary/15", iconColor: "text-primary", filter: "pending" },
+            { label: "Completed", value: completed.length, icon: CheckCircle2, gradient: "from-emerald-500/20 to-emerald-500/5", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-600 dark:text-emerald-400", filter: "completed" },
+            { label: "Due Today", value: dueToday.length, icon: Clock, gradient: "from-amber-500/20 to-amber-500/5", iconBg: "bg-amber-500/15", iconColor: "text-amber-600 dark:text-amber-400", filter: "today" },
+            { label: "High Priority", value: highPriority.length, icon: Target, gradient: "from-red-500/20 to-red-500/5", iconBg: "bg-red-500/15", iconColor: "text-red-600 dark:text-red-400", filter: "high" },
+          ].map((stat) => (
+            <motion.div key={stat.filter} variants={itemVariants} whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}>
+              <div
+                className={`glass-card cursor-pointer bg-gradient-to-br ${stat.gradient} p-4 text-center transition-shadow hover:shadow-elevated`}
+                onClick={() => navigate(`/my-tasks?filter=${stat.filter}`)}
+              >
+                <div className={`mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full ${stat.iconBg}`}>
+                  <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
                 </div>
-                <p className="text-2xl font-bold text-foreground">{pending.length}</p>
-                <p className="text-xs text-muted-foreground">Pending Tasks</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
-            <Card className="cursor-pointer border-none bg-gradient-to-br from-green-500/20 to-green-500/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=completed")}>
-              <CardContent className="p-4 text-center">
-                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20">
-                  <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">{completed.length}</p>
-                <p className="text-xs text-muted-foreground">Completed</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
-            <Card className="cursor-pointer border-none bg-gradient-to-br from-orange-500/20 to-orange-500/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=today")}>
-              <CardContent className="p-4 text-center">
-                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/20">
-                  <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">{dueToday.length}</p>
-                <p className="text-xs text-muted-foreground">Due Today</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div variants={itemVariants} whileTap={{ scale: 0.95 }}>
-            <Card className="cursor-pointer border-none bg-gradient-to-br from-red-500/20 to-red-500/5 shadow-card transition-shadow hover:shadow-elevated" onClick={() => navigate("/my-tasks?filter=high")}>
-              <CardContent className="p-4 text-center">
-                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-500/20">
-                  <Target className="h-5 w-5 text-red-600 dark:text-red-400" />
-                </div>
-                <p className="text-2xl font-bold text-foreground">{highPriority.length}</p>
-                <p className="text-xs text-muted-foreground">High Priority</p>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
 
         {/* Progress Section */}
@@ -265,24 +259,22 @@ const Dashboard = () => {
           transition={{ delay: 0.3 }}
           className="mb-8"
         >
-          <Card className="border-none shadow-elevated">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Overall Progress
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Completion rate</span>
-                <span className="font-semibold text-foreground">{progressPercent}%</span>
+          <div className="glass-card p-5">
+            <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
+              <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+                <TrendingUp size={16} className="text-primary" />
               </div>
-              <Progress value={progressPercent} className="h-3" />
-              <p className="mt-2 text-xs text-muted-foreground">
-                {completed.length} of {tasks.length} tasks completed
-              </p>
-            </CardContent>
-          </Card>
+              Overall Progress
+            </h3>
+            <div className="mb-2 flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Completion rate</span>
+              <span className="font-semibold text-foreground">{progressPercent}%</span>
+            </div>
+            <Progress value={progressPercent} className="h-3" />
+            <p className="mt-2 text-xs text-muted-foreground">
+              {completed.length} of {tasks.length} tasks completed
+            </p>
+          </div>
         </motion.div>
 
         {/* Weekly Progress Chart */}
@@ -292,50 +284,49 @@ const Dashboard = () => {
           transition={{ delay: 0.35 }}
           className="mb-8"
         >
-          <Card className="border-none shadow-elevated">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                Weekly Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-52">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={weeklyData} barGap={4}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
-                    <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
-                    <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={24} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                      labelStyle={{ color: "hsl(var(--foreground))" }}
-                      formatter={(value: number, name: string) => [
-                        value,
-                        name === "completed" ? "Completed" : "Total",
-                      ]}
-                    />
-                    <Bar dataKey="total" fill="hsl(var(--muted-foreground) / 0.25)" radius={[4, 4, 0, 0]} name="total" />
-                    <Bar dataKey="completed" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="completed" />
-                  </BarChart>
-                </ResponsiveContainer>
+          <div className="glass-card p-5">
+            <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
+              <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+                <BarChart3 size={16} className="text-primary" />
               </div>
-              <div className="mt-3 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-muted-foreground/25" />
-                  Total
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
-                  Completed
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+              Weekly Activity
+            </h3>
+            <div className="h-52">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyData} barGap={4}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={24} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "hsl(var(--glass-bg))",
+                      backdropFilter: "blur(16px)",
+                      border: "1px solid hsl(var(--glass-border))",
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                    }}
+                    labelStyle={{ color: "hsl(var(--foreground))" }}
+                    formatter={(value: number, name: string) => [
+                      value,
+                      name === "completed" ? "Completed" : "Total",
+                    ]}
+                  />
+                  <Bar dataKey="total" fill="hsl(var(--muted-foreground) / 0.2)" radius={[6, 6, 0, 0]} name="total" />
+                  <Bar dataKey="completed" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} name="completed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-3 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-muted-foreground/25" />
+                Total
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
+                Completed
+              </span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Daily Productivity Score */}
@@ -382,71 +373,130 @@ const Dashboard = () => {
           transition={{ delay: 0.45 }}
           className="mb-8"
         >
-          <Card className="border-none shadow-elevated">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <RefreshCw className="h-5 w-5 text-primary" />
+          <div className="glass-card overflow-hidden">
+            <div className="h-1 w-full bg-gradient-to-r from-amber-500/50 via-primary/40 to-secondary/30" />
+            <div className="p-5">
+              <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
+                <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+                  <RefreshCw size={16} className="text-primary" />
+                </div>
                 AI Rescheduled Tasks
                 {rescheduledTasks.length > 0 && (
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-sm text-primary">{rescheduledTasks.length}</span>
+                  <span className="rounded-full bg-primary/15 px-2 py-0.5 text-sm text-primary">{rescheduledTasks.length}</span>
                 )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {rescheduledTasks.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                    <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm font-medium text-muted-foreground">No rescheduled tasks</p>
-                  <p className="text-xs text-muted-foreground/70">Overdue tasks will appear here when auto-rescheduled</p>
-                </div>
-              ) : (
-                rescheduledTasks.map((t) => (
-                  <div
-                    key={t.id}
-                    className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-foreground">{t.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Moved to {t.date}{t.time ? ` at ${t.time}` : ""} · Rescheduled {t.missedCount}×
-                      </p>
+              </h3>
+              <div className="space-y-2">
+                {rescheduledTasks.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-6 text-center">
+                    <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full glass">
+                      <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <span className="ml-3 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      <RefreshCw size={12} />
-                      {t.missedCount}×
-                    </span>
+                    <p className="text-sm font-medium text-muted-foreground">No rescheduled tasks</p>
+                    <p className="text-xs text-muted-foreground/70">Overdue tasks will appear here when auto-rescheduled</p>
                   </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
+                ) : (
+                  rescheduledTasks.map((t) => (
+                    <div
+                      key={t.id}
+                      className="glass flex items-center justify-between rounded-xl px-4 py-3"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">{t.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Moved to {t.date}{t.time ? ` at ${t.time}` : ""} · Rescheduled {t.missedCount}×
+                        </p>
+                      </div>
+                      <span className="ml-3 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+                        <RefreshCw size={12} />
+                        {t.missedCount}×
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
         </motion.div>
 
+        {/* Quick Notes */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.48 }}
+          className="mb-8"
+        >
+          <div className="glass-card p-5">
+            <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
+              <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/15">
+                <StickyNote size={16} className="text-secondary" />
+              </div>
+              Quick Notes
+            </h3>
+            <div className="mb-3 flex gap-2">
+              <textarea
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Jot down a quick note..."
+                rows={2}
+                className="glass-input flex-1 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addNote(); }}}
+              />
+              <button
+                onClick={addNote}
+                disabled={!newNote.trim()}
+                className="glass self-end rounded-xl px-3 py-2 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
+              >
+                <Save size={18} />
+              </button>
+            </div>
+            {quickNotes.length === 0 ? (
+              <p className="py-3 text-center text-sm text-muted-foreground/60">No notes yet</p>
+            ) : (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {quickNotes.map((note) => (
+                  <motion.div
+                    key={note.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass flex items-start gap-2 rounded-xl px-3 py-2.5"
+                  >
+                    <p className="flex-1 text-sm text-foreground whitespace-pre-wrap">{note.text}</p>
+                    <button
+                      onClick={() => deleteNote(note.id)}
+                      className="shrink-0 rounded-lg p-1 text-muted-foreground transition-colors hover:text-destructive"
+                    >
+                      <X size={14} />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
 
+        {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
           className="text-center"
         >
-          <div className="flex flex-col items-center gap-4 sm:flex-row">
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <button
               onClick={() => navigate("/tasks")}
-              className="group inline-flex items-center gap-3 rounded-full bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground shadow-elevated transition-all hover:scale-105 hover:shadow-card"
+              className="group glass-card inline-flex items-center gap-3 bg-gradient-to-r from-primary/30 to-secondary/20 px-8 py-4 text-lg font-semibold text-foreground transition-all hover:scale-105"
             >
-              <Plus className="h-6 w-6" />
+              <Plus className="h-6 w-6 text-primary" />
               Add Task
-              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <ChevronRight className="h-5 w-5 text-primary transition-transform group-hover:translate-x-1" />
             </button>
             <button
               onClick={() => navigate("/my-tasks")}
-              className="group inline-flex items-center gap-3 rounded-full border-2 border-primary bg-background px-8 py-4 text-lg font-semibold text-primary shadow-sm transition-all hover:scale-105 hover:bg-primary/5"
+              className="group glass-card inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-foreground transition-all hover:scale-105"
             >
-              <ListTodo className="h-6 w-6" />
+              <ListTodo className="h-6 w-6 text-primary" />
               View Tasks
-              <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <ChevronRight className="h-5 w-5 text-primary transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </motion.div>

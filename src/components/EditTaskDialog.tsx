@@ -48,15 +48,15 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <button
-          className="rounded-md bg-muted p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+          className="glass rounded-xl p-2 text-muted-foreground transition-all hover:text-foreground"
           title="Edit task"
         >
           <Pencil size={16} />
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="glass-card sm:max-w-md border-none">
         <DialogHeader>
-          <DialogTitle>Edit Task</DialogTitle>
+          <DialogTitle className="font-display text-foreground">Edit Task</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <div>
@@ -64,7 +64,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="glass-input w-full rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -74,7 +74,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="glass-input w-full rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
             </div>
             <div>
@@ -83,14 +83,14 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="glass-input w-full rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
             </div>
           </div>
 
           {/* Alarm Toggle */}
           {time && (
-            <div className="flex items-center justify-between rounded-lg border border-input bg-background px-3 py-2.5">
+            <div className="glass flex items-center justify-between rounded-xl px-3 py-2.5">
               <div className="flex items-center gap-2">
                 {alarmEnabled ? <Bell size={16} className="text-primary" /> : <BellOff size={16} className="text-muted-foreground" />}
                 <span className="text-sm font-medium text-foreground">Alarm</span>
@@ -99,7 +99,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
                 type="button"
                 onClick={() => setAlarmEnabled(!alarmEnabled)}
                 className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
-                  alarmEnabled ? "bg-primary" : "bg-input"
+                  alarmEnabled ? "bg-primary" : "bg-muted"
                 }`}
               >
                 <span
@@ -117,7 +117,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Task["priority"])}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="glass-input w-full rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <option value="High">🔴 High</option>
                 <option value="Medium">🟡 Medium</option>
@@ -129,7 +129,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                className="glass-input w-full rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 {allCategories.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -144,12 +144,12 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
               onChange={(e) => setNote(e.target.value)}
               placeholder="Add a quick note..."
               rows={2}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              className="glass-input w-full rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
             />
           </div>
           <button
             onClick={handleSave}
-            className="gradient-bg w-full rounded-md px-4 py-2 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110"
+            className="w-full rounded-xl bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-elevated transition-all hover:brightness-110"
           >
             Save Changes
           </button>
