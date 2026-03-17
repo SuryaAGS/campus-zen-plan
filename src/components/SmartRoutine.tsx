@@ -7,7 +7,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface QuickTask {
   title: string;
@@ -123,18 +122,19 @@ export default function SmartRoutine({ existingTasks, onTaskAdded }: SmartRoutin
   return (
     <div className="space-y-4">
       {/* Time-based suggestions */}
-      <Card className="border-none shadow-elevated">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Suggested Daily Tasks
-          </CardTitle>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="glass-card overflow-hidden">
+        <div className="h-1 w-full bg-gradient-to-r from-primary/60 via-secondary/40 to-primary/20" />
+        <div className="p-5">
+          <div className="mb-1 flex items-center gap-2">
+            <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+              <Sparkles size={16} className="text-primary" />
+            </div>
+            <h3 className="font-display font-semibold text-foreground">Suggested Daily Tasks</h3>
+          </div>
+          <p className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
             {suggested.icon}
             {suggested.label}
           </p>
-        </CardHeader>
-        <CardContent className="pb-4">
           <div className="flex flex-wrap gap-2">
             {suggested.tasks.map(task => {
               const added = alreadyAdded(task.title);
@@ -147,8 +147,8 @@ export default function SmartRoutine({ existingTasks, onTaskAdded }: SmartRoutin
                   disabled={added || !!addingId}
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
                     added
-                      ? "bg-primary/10 text-primary cursor-default"
-                      : "bg-muted text-foreground hover:bg-primary hover:text-primary-foreground"
+                      ? "bg-primary/15 text-primary cursor-default"
+                      : "glass text-foreground hover:bg-primary/20 hover:text-primary"
                   } disabled:opacity-60`}
                 >
                   {loading ? <Loader2 size={16} className="animate-spin" /> : task.icon}
@@ -158,48 +158,46 @@ export default function SmartRoutine({ existingTasks, onTaskAdded }: SmartRoutin
               );
             })}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* All Quick Add Buttons */}
-      <Card className="border-none shadow-elevated">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            ⚡ Quick Add
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">Tap to instantly add a routine task</p>
-        </CardHeader>
-        <CardContent className="pb-4">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {QUICK_TASKS.map(task => {
-              const added = alreadyAdded(task.title);
-              const loading = addingId === task.title;
-              return (
-                <motion.button
-                  key={task.title}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => addQuickTask(task)}
-                  disabled={added || !!addingId}
-                  className={`flex flex-col items-center gap-1.5 rounded-xl p-3 text-center transition-all ${
-                    added
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted text-foreground hover:bg-primary/20 hover:shadow-sm"
-                  } disabled:opacity-60`}
-                >
-                  <div className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${
-                    added ? "bg-primary/20" : "bg-background"
-                  }`}>
-                    {loading ? <Loader2 size={18} className="animate-spin" /> : task.icon}
-                  </div>
-                  <span className="text-xs font-medium leading-tight">{task.title}</span>
-                  <span className="text-[10px] text-muted-foreground">{task.defaultTime}</span>
-                  {added && <span className="text-[10px] font-semibold text-primary">Added ✓</span>}
-                </motion.button>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="glass-card p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-lg">⚡</span>
+          <h3 className="font-display font-semibold text-foreground">Quick Add</h3>
+        </div>
+        <p className="mb-4 text-sm text-muted-foreground">Tap to instantly add a routine task</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {QUICK_TASKS.map(task => {
+            const added = alreadyAdded(task.title);
+            const loading = addingId === task.title;
+            return (
+              <motion.button
+                key={task.title}
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.03 }}
+                onClick={() => addQuickTask(task)}
+                disabled={added || !!addingId}
+                className={`glass-card flex flex-col items-center gap-1.5 p-3 text-center transition-all ${
+                  added
+                    ? "!bg-primary/15 text-primary"
+                    : "hover:!bg-primary/10"
+                } disabled:opacity-60`}
+              >
+                <div className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${
+                  added ? "bg-primary/20" : "glass"
+                }`}>
+                  {loading ? <Loader2 size={18} className="animate-spin" /> : task.icon}
+                </div>
+                <span className="text-xs font-medium leading-tight text-foreground">{task.title}</span>
+                <span className="text-[10px] text-muted-foreground">{task.defaultTime}</span>
+                {added && <span className="text-[10px] font-semibold text-primary">Added ✓</span>}
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

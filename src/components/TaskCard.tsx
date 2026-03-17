@@ -16,10 +16,16 @@ interface TaskCardProps {
   allCategories: string[];
 }
 
-const priorityStyles = {
-  High: "border-l-destructive text-destructive",
-  Medium: "border-l-amber-500 text-amber-600",
-  Low: "border-l-emerald-500 text-emerald-600",
+const priorityAccents = {
+  High: "border-l-destructive",
+  Medium: "border-l-amber-500",
+  Low: "border-l-emerald-500",
+};
+
+const priorityText = {
+  High: "text-destructive",
+  Medium: "text-amber-600 dark:text-amber-400",
+  Low: "text-emerald-600 dark:text-emerald-400",
 };
 
 const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
@@ -33,19 +39,20 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -50 }}
         transition={{ delay: index * 0.05 }}
-        className={`flex items-center justify-between rounded-lg border-l-4 bg-card p-4 shadow-card transition-all hover:shadow-elevated ${priorityStyles[task.priority].split(" ")[0]}`}
+        whileHover={{ scale: 1.01, y: -2 }}
+        className={`glass-card flex items-center justify-between border-l-4 p-4 transition-all ${priorityAccents[task.priority]}`}
       >
         <div className="flex flex-col gap-1 min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className={`font-display font-semibold text-card-foreground ${task.completed ? "line-through opacity-50" : ""}`}>
+            <span className={`font-display font-semibold text-foreground ${task.completed ? "line-through opacity-50" : ""}`}>
               {task.title}
             </span>
             {task.time && !task.completed && (
               <span
                 className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
                   alarmOn
-                    ? "bg-primary/10 text-primary"
-                    : "bg-muted text-muted-foreground"
+                    ? "bg-primary/15 text-primary"
+                    : "glass text-muted-foreground"
                 }`}
                 title={alarmOn ? "Alarm enabled" : "Alarm disabled"}
               >
@@ -58,7 +65,7 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
             <p className="text-xs text-muted-foreground italic line-clamp-2">{task.note}</p>
           )}
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className={`font-medium ${priorityStyles[task.priority].split(" ")[1]}`}>
+            <span className={`font-medium ${priorityText[task.priority]}`}>
               {task.priority}
             </span>
             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${getCategoryColor(task.category).bg} ${getCategoryColor(task.category).text}`}>
@@ -71,10 +78,10 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
           {!task.completed && task.time && onToggleAlarm && (
             <button
               onClick={() => onToggleAlarm(task.id, !alarmOn)}
-              className={`rounded-md p-2 transition-colors ${
+              className={`rounded-xl p-2 transition-all ${
                 alarmOn
-                  ? "bg-primary/10 text-primary hover:bg-primary/20"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  ? "glass bg-primary/15 text-primary hover:bg-primary/25"
+                  : "glass text-muted-foreground hover:text-foreground"
               }`}
               title={alarmOn ? "Disable alarm" : "Enable alarm"}
             >
@@ -84,7 +91,7 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
           {!task.completed && (
             <button
               onClick={() => onComplete(task.id)}
-              className="rounded-md bg-accent p-2 text-accent-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+              className="glass rounded-xl p-2 text-accent-foreground transition-all hover:bg-primary/20 hover:text-primary"
               title="Mark complete"
             >
               <Check size={16} />
@@ -93,7 +100,7 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
           {task.completed && onUncomplete && (
             <button
               onClick={() => onUncomplete(task.id)}
-              className="rounded-md bg-accent p-2 text-accent-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+              className="glass rounded-xl p-2 text-accent-foreground transition-all hover:bg-primary/20 hover:text-primary"
               title="Mark as pending"
             >
               <Undo2 size={16} />
@@ -104,7 +111,7 @@ const TaskCard = React.forwardRef<HTMLDivElement, TaskCardProps>(
           )}
           <button
             onClick={() => onDelete(task.id)}
-            className="rounded-md bg-muted p-2 text-muted-foreground transition-colors hover:bg-destructive hover:text-destructive-foreground"
+            className="glass rounded-xl p-2 text-muted-foreground transition-all hover:bg-destructive/20 hover:text-destructive"
           >
             <Trash2 size={16} />
           </button>

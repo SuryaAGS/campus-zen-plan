@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Trophy, Flame, Star } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DailyProductivityScoreProps {
   completedToday: number;
@@ -21,19 +20,19 @@ export default function DailyProductivityScore({ completedToday, totalToday, str
   const score = getScoreEmoji(percent);
 
   return (
-    <Card className="border-none shadow-elevated overflow-hidden">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Trophy className="h-5 w-5 text-primary" />
+    <div className="glass-card overflow-hidden">
+      <div className="p-5">
+        <h3 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
+          <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
+            <Trophy size={16} className="text-primary" />
+          </div>
           Today's Productivity
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </h3>
         <div className="flex items-center gap-6">
           {/* Circular Score */}
           <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
             <svg className="h-24 w-24 -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="42" fill="none" strokeWidth="8" className="stroke-muted" />
+              <circle cx="50" cy="50" r="42" fill="none" strokeWidth="8" className="stroke-muted/50" />
               <motion.circle
                 cx="50" cy="50" r="42" fill="none" strokeWidth="8"
                 strokeLinecap="round"
@@ -65,7 +64,7 @@ export default function DailyProductivityScore({ completedToday, totalToday, str
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
