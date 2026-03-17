@@ -107,11 +107,11 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg">
+    <div className="app-gradient-bg">
       <div className="container mx-auto max-w-lg px-4 py-8">
         <button
           onClick={() => navigate("/")}
-          className="mb-6 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground"
+          className="mb-6 inline-flex items-center gap-2 glass rounded-full px-3 py-1.5 text-sm font-medium text-foreground transition-all hover:scale-105"
         >
           <ArrowLeft size={16} /> Back to Tasks
         </button>
@@ -119,14 +119,14 @@ export default function Profile() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl bg-card p-8 shadow-elevated"
+          className="glass-card p-8"
         >
-          <h1 className="mb-6 font-display text-2xl font-bold text-card-foreground">Your Profile</h1>
+          <h1 className="mb-6 font-display text-2xl font-bold text-foreground">Your Profile</h1>
 
           {/* Avatar */}
           <div className="mb-6 flex flex-col items-center">
             <div
-              className="relative mb-3 h-24 w-24 cursor-pointer overflow-hidden rounded-full bg-muted"
+              className="relative mb-3 h-24 w-24 cursor-pointer overflow-hidden rounded-full glass"
               onClick={() => fileInputRef.current?.click()}
             >
               {avatarUrl ? (
@@ -136,8 +136,8 @@ export default function Profile() {
                   <User size={40} className="text-muted-foreground" />
                 </div>
               )}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100">
-                <Camera size={24} className="text-white" />
+              <div className="absolute inset-0 flex items-center justify-center bg-foreground/30 opacity-0 transition-opacity hover:opacity-100">
+                <Camera size={24} className="text-primary-foreground" />
               </div>
             </div>
             <input
@@ -159,7 +159,7 @@ export default function Profile() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              className="glass-input w-full rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
 
@@ -169,14 +169,14 @@ export default function Profile() {
             <input
               value={user?.email || ""}
               readOnly
-              className="w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground"
+              className="glass-input w-full rounded-xl px-3 py-2.5 text-sm text-muted-foreground"
             />
           </div>
 
           <button
             onClick={handleSave}
             disabled={loading}
-            className="gradient-bg flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-card transition-all hover:shadow-elevated hover:brightness-110 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-elevated transition-all hover:brightness-110 disabled:opacity-50"
           >
             <Save size={16} />
             {loading ? "Saving..." : "Save Changes"}
@@ -188,9 +188,9 @@ export default function Profile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mt-6 rounded-xl bg-card p-8 shadow-elevated"
+          className="mt-6 glass-card p-8"
         >
-          <h2 className="mb-5 flex items-center gap-2 font-display text-lg font-bold text-card-foreground">
+          <h2 className="mb-5 flex items-center gap-2 font-display text-lg font-bold text-foreground">
             <Palette size={20} className="text-primary" />
             Theme Customization
           </h2>
@@ -204,10 +204,10 @@ export default function Profile() {
                   <button
                     key={key}
                     onClick={() => updateTheme({ accentColor: key })}
-                    className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
+                    className={`flex items-center gap-2 glass rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                       theme.accentColor === key
-                        ? "border-primary bg-accent text-accent-foreground shadow-sm"
-                        : "border-input text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                        ? "ring-2 ring-primary bg-primary/15 text-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-primary/10"
                     }`}
                   >
                     <span
@@ -232,10 +232,10 @@ export default function Profile() {
                 <button
                   key={value}
                   onClick={() => updateTheme({ fontSize: value })}
-                  className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
+                  className={`flex-1 glass rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                     theme.fontSize === value
-                      ? "border-primary bg-accent text-accent-foreground shadow-sm"
-                      : "border-input text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                      ? "ring-2 ring-primary bg-primary/15 text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-primary/10"
                   }`}
                 >
                   {label}
@@ -245,14 +245,14 @@ export default function Profile() {
           </div>
 
           {/* Dark Mode Toggle */}
-          <div className="flex items-center justify-between rounded-lg border border-input px-4 py-3">
+          <div className="glass flex items-center justify-between rounded-xl px-4 py-3">
             <div className="flex items-center gap-2">
               {theme.darkMode ? (
                 <Moon size={16} className="text-primary" />
               ) : (
                 <Sun size={16} className="text-primary" />
               )}
-              <span className="text-sm font-medium text-card-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {theme.darkMode ? "Dark Mode" : "Light Mode"}
               </span>
             </div>
@@ -263,7 +263,7 @@ export default function Profile() {
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-card shadow transition-transform ${
+                className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-background shadow transition-transform ${
                   theme.darkMode ? "translate-x-5" : "translate-x-0"
                 }`}
               />
@@ -285,10 +285,10 @@ export default function Profile() {
                   <button
                     key={key}
                     onClick={() => updateTheme({ language: key })}
-                    className={`flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all ${
+                    className={`flex items-center gap-2 glass rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                       theme.language === key
-                        ? "border-primary bg-accent text-accent-foreground shadow-sm"
-                        : "border-input text-muted-foreground hover:border-primary/40 hover:bg-muted"
+                        ? "ring-2 ring-primary bg-primary/15 text-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-primary/10"
                     }`}
                   >
                     <span className="text-base">{flag}</span>
@@ -309,7 +309,7 @@ export default function Profile() {
         >
           <button
             onClick={() => navigate("/notifications")}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-input bg-card py-3.5 text-sm font-medium text-muted-foreground shadow-card transition-colors hover:bg-muted hover:text-foreground"
+            className="glass-card flex w-full items-center justify-center gap-2 py-3.5 text-sm font-medium text-muted-foreground transition-all hover:text-foreground"
           >
             <Bell size={16} />
             Notification Settings

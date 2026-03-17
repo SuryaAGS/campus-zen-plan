@@ -13,7 +13,6 @@ import { recordCompletion } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import TaskCard from "@/components/TaskCard";
-import ProgressBar from "@/components/ProgressBar";
 import TaskReminders from "@/components/TaskReminders";
 import { useTaskReminders } from "@/hooks/useTaskReminders";
 import { toast } from "sonner";
@@ -29,7 +28,6 @@ const MyTasks = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { allCategoryNames } = useCategories();
 
-  // Quick-add FAB state
   const [fabOpen, setFabOpen] = useState(false);
   const [qTitle, setQTitle] = useState("");
   const [qDate, setQDate] = useState("");
@@ -99,7 +97,6 @@ const MyTasks = () => {
         missedCount: (t as any).missed_count ?? 0,
       }));
 
-      // Auto-reschedule overdue tasks with progressive delay
       const now = new Date();
       const overdue = mapped.filter((t) => {
         if (t.completed) return false;
@@ -112,7 +109,6 @@ const MyTasks = () => {
 
         for (const task of overdue) {
           const newMissedCount = task.missedCount + 1;
-          // Immediate reschedule: move to 30 minutes from now
           const rescheduleTime = new Date();
           rescheduleTime.setMinutes(rescheduleTime.getMinutes() + 30);
 
@@ -243,13 +239,13 @@ const MyTasks = () => {
   const progressPercent = tasks.length > 0 ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div className="app-gradient-bg">
       {/* Header */}
-      <div className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-lg">
+      <div className="sticky top-0 z-40 glass border-b border-transparent">
         <div className="container mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <button
             onClick={() => navigate("/dashboard")}
-            className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground transition-all hover:bg-muted/80"
+            className="inline-flex items-center gap-2 glass rounded-full px-3 py-1.5 text-sm font-medium text-foreground transition-all hover:scale-105"
           >
             <ArrowLeft size={16} />
             Dashboard
@@ -257,7 +253,7 @@ const MyTasks = () => {
           <h1 className="font-display text-xl font-bold text-foreground">My Tasks</h1>
           <button
             onClick={() => navigate("/tasks")}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:brightness-110"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:brightness-110"
           >
             <Plus size={16} />
             Add
@@ -271,7 +267,7 @@ const MyTasks = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-4 flex items-center justify-between rounded-lg bg-primary/10 px-4 py-2"
+            className="mb-4 glass flex items-center justify-between rounded-xl bg-primary/10 px-4 py-2"
           >
             <span className="text-sm font-medium text-primary">
               Showing: {urlFilter === "pending" ? "Pending Tasks" : urlFilter === "completed" ? "Completed Tasks" : urlFilter === "today" ? "Due Today" : "High Priority"}
@@ -284,27 +280,28 @@ const MyTasks = () => {
             </button>
           </motion.div>
         )}
+
         {/* Quick Stats */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-5 grid grid-cols-3 gap-3"
         >
-          <div className="rounded-xl bg-card p-3 text-center shadow-sm">
+          <div className="glass-card p-3 text-center">
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
               <ListTodo size={14} />
               <span className="text-xs">Pending</span>
             </div>
             <p className="mt-1 text-xl font-bold text-foreground">{tasks.filter(t => !t.completed).length}</p>
           </div>
-          <div className="rounded-xl bg-card p-3 text-center shadow-sm">
+          <div className="glass-card p-3 text-center">
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
               <CheckCircle2 size={14} />
               <span className="text-xs">Done</span>
             </div>
             <p className="mt-1 text-xl font-bold text-foreground">{tasks.filter(t => t.completed).length}</p>
           </div>
-          <div className="rounded-xl bg-card p-3 text-center shadow-sm">
+          <div className="glass-card p-3 text-center">
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
               <span className="text-xs">Progress</span>
             </div>
@@ -335,7 +332,7 @@ const MyTasks = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tasks..."
-              className="w-full rounded-lg border border-input bg-card pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="glass-input w-full rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
           </div>
 
@@ -350,7 +347,7 @@ const MyTasks = () => {
                   className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all ${
                     filterCategory === c
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      : "glass text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {color && <span className={`inline-block h-2 w-2 rounded-full ${color.dot}`} />}
@@ -360,7 +357,7 @@ const MyTasks = () => {
             })}
             <button
               onClick={() => navigate("/categories")}
-              className="rounded-full bg-muted p-1.5 text-muted-foreground transition-all hover:bg-muted/80"
+              className="glass rounded-full p-1.5 text-muted-foreground transition-all hover:text-foreground"
               aria-label="Manage categories"
             >
               <Settings size={14} />
@@ -377,7 +374,7 @@ const MyTasks = () => {
                 className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-all ${
                   sortBy === s
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    : "glass text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {s}
@@ -398,20 +395,20 @@ const MyTasks = () => {
         >
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
             📌 Pending Tasks
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-sm text-primary">{pending.length}</span>
+            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-sm text-primary">{pending.length}</span>
           </h2>
           <AnimatePresence>
             {pending.length === 0 && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center gap-3 rounded-xl bg-card py-10 text-center shadow-sm"
+                className="glass-card flex flex-col items-center gap-3 py-10 text-center"
               >
                 <ListTodo size={40} className="text-muted-foreground/40" />
                 <p className="text-sm text-muted-foreground">No pending tasks!</p>
                 <button
                   onClick={() => navigate("/tasks")}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:brightness-110"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-secondary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:brightness-110"
                 >
                   <Plus size={14} /> Add a task
                 </button>
@@ -442,7 +439,7 @@ const MyTasks = () => {
           >
             <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
               ✅ Completed
-              <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-sm text-green-600 dark:text-green-400">{completed.length}</span>
+              <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-sm text-emerald-600 dark:text-emerald-400">{completed.length}</span>
             </h2>
             <AnimatePresence>
               {completed.map((task, i) => (
@@ -478,11 +475,11 @@ const MyTasks = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 80, scale: 0.9 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed bottom-24 left-4 right-4 z-50 mx-auto max-w-md rounded-2xl bg-card p-5 shadow-elevated"
+              className="fixed bottom-24 left-4 right-4 z-50 mx-auto max-w-md glass-card p-5"
             >
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-display text-base font-semibold text-foreground">Quick Add</h3>
-                <button onClick={() => setFabOpen(false)} className="rounded-full p-1 text-muted-foreground hover:bg-muted">
+                <button onClick={() => setFabOpen(false)} className="glass rounded-full p-1 text-muted-foreground hover:text-foreground">
                   <X size={18} />
                 </button>
               </div>
@@ -492,7 +489,7 @@ const MyTasks = () => {
                   onChange={(e) => setQTitle(e.target.value)}
                   placeholder="Task title..."
                   autoFocus
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="glass-input w-full rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   onKeyDown={(e) => e.key === "Enter" && quickAdd()}
                 />
                 <div className="grid grid-cols-2 gap-2">
@@ -500,20 +497,20 @@ const MyTasks = () => {
                     type="date"
                     value={qDate}
                     onChange={(e) => setQDate(e.target.value)}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="glass-input rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                   <input
                     type="time"
                     value={qTime}
                     onChange={(e) => setQTime(e.target.value)}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="glass-input rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <select
                     value={qPriority}
                     onChange={(e) => setQPriority(e.target.value as Task["priority"])}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="glass-input rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="High">🔴 High</option>
                     <option value="Medium">🟡 Medium</option>
@@ -522,7 +519,7 @@ const MyTasks = () => {
                   <select
                     value={qCategory}
                     onChange={(e) => setQCategory(e.target.value)}
-                    className="rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="glass-input rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     {allCategoryNames.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -532,7 +529,7 @@ const MyTasks = () => {
                 <button
                   onClick={quickAdd}
                   disabled={qAdding}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-110 disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-110 disabled:opacity-50"
                 >
                   <Plus size={16} />
                   {qAdding ? "Adding..." : "Add Task"}
@@ -545,7 +542,7 @@ const MyTasks = () => {
 
       <motion.button
         onClick={() => setFabOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-elevated transition-all hover:scale-110"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-elevated transition-all hover:scale-110"
         whileTap={{ scale: 0.9 }}
         aria-label="Quick add task"
       >
