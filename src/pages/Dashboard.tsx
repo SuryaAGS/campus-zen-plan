@@ -298,7 +298,7 @@ const Dashboard = () => {
         {/* AI Suggestion — lazy */}
         <div className="mb-8">
           <LazySection>
-            <AiSuggestionWrapper taskCount={tasks.length} />
+            <AiSuggestionInner taskCount={tasks.length} />
           </LazySection>
         </div>
 
