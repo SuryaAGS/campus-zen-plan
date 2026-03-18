@@ -1,7 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { 
-  ClipboardCheck, Moon, Sun, LogOut, UserCircle, CalendarDays, 
   Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3, StickyNote, Save, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
