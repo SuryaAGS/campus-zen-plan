@@ -429,12 +429,10 @@ const Dashboard = () => {
   );
 };
 
-// Wrapper to lazy-load AI suggestion hook
-function AiSuggestionWrapper({ taskCount }: { taskCount: number }) {
-  const { useAiSuggestion } = require("@/hooks/useAiSuggestion");
+// Inline wrapper that uses the hook properly
+function AiSuggestionInner({ taskCount }: { taskCount: number }) {
   const { suggestion, loading, refresh } = useAiSuggestion(taskCount);
-  const AiSuggestionComp = require("@/components/AiSuggestion").default;
-  return <AiSuggestionComp tip={suggestion} loading={loading} onRefresh={refresh} />;
+  return <AiSuggestion tip={suggestion} loading={loading} onRefresh={refresh} />;
 }
 
 export default Dashboard;
