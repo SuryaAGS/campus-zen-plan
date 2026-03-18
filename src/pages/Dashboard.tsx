@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import StreakBadge from "@/components/StreakBadge";
 import { Progress } from "@/components/ui/progress";
+import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 
 // Lazy load secondary sections
 const AiSuggestion = lazy(() => import("@/components/AiSuggestion"));
