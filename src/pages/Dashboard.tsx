@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { 
   ClipboardCheck, Moon, Sun, LogOut, UserCircle, CalendarDays, 
@@ -12,12 +12,13 @@ import { refreshStreak, StreakData } from "@/lib/tasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import StreakBadge from "@/components/StreakBadge";
-import AiSuggestion from "@/components/AiSuggestion";
-import { useAiSuggestion } from "@/hooks/useAiSuggestion";
 import { Progress } from "@/components/ui/progress";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import SmartRoutine from "@/components/SmartRoutine";
-import DailyProductivityScore from "@/components/DailyProductivityScore";
+
+// Lazy load secondary sections
+const AiSuggestion = lazy(() => import("@/components/AiSuggestion"));
+const SmartRoutine = lazy(() => import("@/components/SmartRoutine"));
+const DailyProductivityScore = lazy(() => import("@/components/DailyProductivityScore"));
+const WeeklyChart = lazy(() => import("@/components/WeeklyChart"));
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -37,21 +38,21 @@ const Dashboard = () => {
   });
   const [newNote, setNewNote] = useState("");
 
-  const saveNotes = (notes: typeof quickNotes) => {
+  const saveNotes = useCallback((notes: typeof quickNotes) => {
     setQuickNotes(notes);
     localStorage.setItem("taskstodo-quick-notes", JSON.stringify(notes));
-  };
+  }, []);
 
-  const addNote = () => {
+  const addNote = useCallback(() => {
     if (!newNote.trim()) return;
     const note = { id: crypto.randomUUID(), text: newNote.trim(), created: new Date().toISOString() };
     saveNotes([note, ...quickNotes]);
     setNewNote("");
-  };
+  }, [newNote, quickNotes, saveNotes]);
 
-  const deleteNote = (id: string) => {
+  const deleteNote = useCallback((id: string) => {
     saveNotes(quickNotes.filter(n => n.id !== id));
-  };
+  }, [quickNotes, saveNotes]);
 
   useEffect(() => {
     if (!user) return;
@@ -111,54 +112,41 @@ const Dashboard = () => {
     fetchTasks();
   }, [fetchTasks]);
 
-  const { suggestion: aiSuggestion, loading: aiLoading, refresh: refreshAi } = useAiSuggestion(tasks.length);
-
-  const pending = tasks.filter((t) => !t.completed);
-  const completed = tasks.filter((t) => t.completed);
+  const pending = useMemo(() => tasks.filter((t) => !t.completed), [tasks]);
+  const completed = useMemo(() => tasks.filter((t) => t.completed), [tasks]);
   const today = new Date().toISOString().split("T")[0];
-  const dueToday = pending.filter((t) => t.date === today);
-  const highPriority = pending.filter((t) => t.priority === "High");
+  const dueToday = useMemo(() => pending.filter((t) => t.date === today), [pending, today]);
+  const highPriority = useMemo(() => pending.filter((t) => t.priority === "High"), [pending]);
   const progressPercent = tasks.length > 0 ? Math.round((completed.length / tasks.length) * 100) : 0;
 
-  const weeklyData = useMemo(() => {
-    const days: { day: string; date: string; completed: number; total: number }[] = [];
-    const now = new Date();
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split("T")[0];
-      const dayTasks = rawTasks.filter((t) => t.date === dateStr);
-      const dayCompleted = dayTasks.filter((t) => t.completed);
-      days.push({
-        day: i === 0 ? "Today" : dayNames[d.getDay()],
-        date: dateStr,
-        completed: dayCompleted.length,
-        total: dayTasks.length,
-      });
-    }
-    return days;
-  }, [rawTasks]);
+  const completedToday = useMemo(() => tasks.filter(t => t.completed && t.date === today).length, [tasks, today]);
+  const totalToday = useMemo(() => tasks.filter(t => t.date === today).length, [tasks, today]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.08 }
+      transition: { staggerChildren: 0.05 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.15 } }
   };
+
+  const LazySection = ({ children }: { children: React.ReactNode }) => (
+    <Suspense fallback={<div className="glass-card-lite animate-pulse h-32 rounded-xl" />}>
+      {children}
+    </Suspense>
+  );
 
   return (
     <div className="app-gradient-bg">
       {/* Profile - Left */}
       <button
         onClick={() => navigate("/profile")}
-        className="fixed left-3 top-3 z-50 flex items-center gap-1.5 glass rounded-full px-3 py-1.5 transition-all hover:scale-105"
+        className="fixed left-3 top-3 z-50 flex items-center gap-1.5 glass rounded-full px-3 py-1.5 transition-colors hover:bg-primary/10"
         aria-label="Profile"
       >
         {profile.avatar_url ? (
@@ -178,28 +166,28 @@ const Dashboard = () => {
         <FeedbackDialog />
         <button
           onClick={() => navigate("/notifications")}
-          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-colors hover:bg-primary/10 sm:p-3"
           aria-label="Notification settings"
         >
           <Bell size={18} className="text-foreground sm:size-5" />
         </button>
         <button
           onClick={() => navigate("/calendar")}
-          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-colors hover:bg-primary/10 sm:p-3"
           aria-label="Calendar view"
         >
           <CalendarDays size={18} className="text-foreground sm:size-5" />
         </button>
         <button
           onClick={() => setDark((d) => !d)}
-          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-colors hover:bg-primary/10 sm:p-3"
           aria-label="Toggle dark mode"
         >
           {dark ? <Sun size={18} className="text-foreground sm:size-5" /> : <Moon size={18} className="text-foreground sm:size-5" />}
         </button>
         <button
           onClick={signOut}
-          className="glass rounded-full p-2 transition-all hover:scale-110 sm:p-3"
+          className="glass rounded-full p-2 transition-colors hover:bg-primary/10 sm:p-3"
           aria-label="Sign out"
         >
           <LogOut size={18} className="text-foreground sm:size-5" />
@@ -209,8 +197,9 @@ const Dashboard = () => {
       <div className="container mx-auto max-w-4xl px-4 py-16 pt-20">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
           className="mb-8 text-center"
         >
           <div className="mb-4 flex items-center justify-center gap-3">
@@ -237,7 +226,7 @@ const Dashboard = () => {
             { label: "Due Today", value: dueToday.length, icon: Clock, gradient: "from-amber-500/20 to-amber-500/5", iconBg: "bg-amber-500/15", iconColor: "text-amber-600 dark:text-amber-400", filter: "today" },
             { label: "High Priority", value: highPriority.length, icon: Target, gradient: "from-red-500/20 to-red-500/5", iconBg: "bg-red-500/15", iconColor: "text-red-600 dark:text-red-400", filter: "high" },
           ].map((stat) => (
-            <motion.div key={stat.filter} variants={itemVariants} whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}>
+            <motion.div key={stat.filter} variants={itemVariants} whileTap={{ scale: 0.95 }}>
               <div
                 className={`glass-card cursor-pointer bg-gradient-to-br ${stat.gradient} p-4 text-center transition-shadow hover:shadow-elevated`}
                 onClick={() => navigate(`/my-tasks?filter=${stat.filter}`)}
@@ -254,9 +243,9 @@ const Dashboard = () => {
 
         {/* Progress Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.15, duration: 0.2 }}
           className="mb-8"
         >
           <div className="glass-card p-5">
@@ -277,102 +266,43 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Weekly Progress Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="mb-8"
-        >
-          <div className="glass-card p-5">
-            <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-              <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
-                <BarChart3 size={16} className="text-primary" />
-              </div>
-              Weekly Activity
-            </h3>
-            <div className="h-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyData} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" axisLine={false} tickLine={false} width={24} />
-                  <Tooltip
-                    contentStyle={{
-                      background: "hsl(var(--glass-bg))",
-                      backdropFilter: "blur(16px)",
-                      border: "1px solid hsl(var(--glass-border))",
-                      borderRadius: "12px",
-                      fontSize: "12px",
-                    }}
-                    labelStyle={{ color: "hsl(var(--foreground))" }}
-                    formatter={(value: number, name: string) => [
-                      value,
-                      name === "completed" ? "Completed" : "Total",
-                    ]}
-                  />
-                  <Bar dataKey="total" fill="hsl(var(--muted-foreground) / 0.2)" radius={[6, 6, 0, 0]} name="total" />
-                  <Bar dataKey="completed" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} name="completed" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="mt-3 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-muted-foreground/25" />
-                Total
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
-                Completed
-              </span>
-            </div>
-          </div>
-        </motion.div>
+        {/* Weekly Progress Chart — lazy */}
+        <div className="mb-8">
+          <LazySection>
+            <WeeklyChart rawTasks={rawTasks} />
+          </LazySection>
+        </div>
 
-        {/* Daily Productivity Score */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.33 }}
-          className="mb-8"
-        >
-          <DailyProductivityScore
-            completedToday={tasks.filter(t => t.completed && t.date === today).length}
-            totalToday={tasks.filter(t => t.date === today).length}
-            streak={streak.current}
-          />
-        </motion.div>
+        {/* Daily Productivity Score — lazy */}
+        <div className="mb-8">
+          <LazySection>
+            <DailyProductivityScore
+              completedToday={completedToday}
+              totalToday={totalToday}
+              streak={streak.current}
+            />
+          </LazySection>
+        </div>
 
-        {/* Smart Routine */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="mb-8"
-        >
-          <SmartRoutine
-            existingTasks={tasks.map(t => ({ title: t.title, date: t.date, time: t.time, completed: t.completed }))}
-            onTaskAdded={fetchTasks}
-          />
-        </motion.div>
+        {/* Smart Routine — lazy */}
+        <div className="mb-8">
+          <LazySection>
+            <SmartRoutine
+              existingTasks={tasks.map(t => ({ title: t.title, date: t.date, time: t.time, completed: t.completed }))}
+              onTaskAdded={fetchTasks}
+            />
+          </LazySection>
+        </div>
 
-        {/* AI Suggestion */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-8"
-        >
-          <AiSuggestion tip={aiSuggestion} loading={aiLoading} onRefresh={refreshAi} />
-        </motion.div>
+        {/* AI Suggestion — lazy */}
+        <div className="mb-8">
+          <LazySection>
+            <AiSuggestionWrapper taskCount={tasks.length} />
+          </LazySection>
+        </div>
 
         {/* AI Rescheduled Tasks */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <div className="glass-card overflow-hidden">
             <div className="h-1 w-full bg-gradient-to-r from-amber-500/50 via-primary/40 to-secondary/30" />
             <div className="p-5">
@@ -388,7 +318,7 @@ const Dashboard = () => {
               <div className="space-y-2">
                 {rescheduledTasks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-6 text-center">
-                    <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full glass">
+                    <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full glass-card-lite">
                       <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">No rescheduled tasks</p>
@@ -398,7 +328,7 @@ const Dashboard = () => {
                   rescheduledTasks.map((t) => (
                     <div
                       key={t.id}
-                      className="glass flex items-center justify-between rounded-xl px-4 py-3"
+                      className="glass-card-lite flex items-center justify-between px-4 py-3"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-foreground">{t.title}</p>
@@ -416,15 +346,10 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Quick Notes */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.48 }}
-          className="mb-8"
-        >
+        <div className="mb-8">
           <div className="glass-card p-5">
             <h3 className="mb-3 flex items-center gap-2 font-display text-lg font-semibold text-foreground">
               <div className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/15">
@@ -444,7 +369,7 @@ const Dashboard = () => {
               <button
                 onClick={addNote}
                 disabled={!newNote.trim()}
-                className="glass self-end rounded-xl px-3 py-2 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
+                className="glass-card-lite self-end rounded-xl px-3 py-2 text-primary transition-colors hover:bg-primary/20 disabled:opacity-40"
               >
                 <Save size={18} />
               </button>
@@ -454,11 +379,9 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {quickNotes.map((note) => (
-                  <motion.div
+                  <div
                     key={note.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="glass flex items-start gap-2 rounded-xl px-3 py-2.5"
+                    className="glass-card-lite flex items-start gap-2 px-3 py-2.5"
                   >
                     <p className="flex-1 text-sm text-foreground whitespace-pre-wrap">{note.text}</p>
                     <button
@@ -467,24 +390,24 @@ const Dashboard = () => {
                     >
                       <X size={14} />
                     </button>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Action Buttons */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.25, duration: 0.15 }}
           className="text-center"
         >
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <button
               onClick={() => navigate("/tasks")}
-              className="group glass-card inline-flex items-center gap-3 bg-gradient-to-r from-primary/30 to-secondary/20 px-8 py-4 text-lg font-semibold text-foreground transition-all hover:scale-105"
+              className="group glass-card inline-flex items-center gap-3 bg-gradient-to-r from-primary/30 to-secondary/20 px-8 py-4 text-lg font-semibold text-foreground transition-shadow hover:shadow-elevated"
             >
               <Plus className="h-6 w-6 text-primary" />
               Add Task
@@ -492,7 +415,7 @@ const Dashboard = () => {
             </button>
             <button
               onClick={() => navigate("/my-tasks")}
-              className="group glass-card inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-foreground transition-all hover:scale-105"
+              className="group glass-card inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-foreground transition-shadow hover:shadow-elevated"
             >
               <ListTodo className="h-6 w-6 text-primary" />
               View Tasks
@@ -504,5 +427,13 @@ const Dashboard = () => {
     </div>
   );
 };
+
+// Wrapper to lazy-load AI suggestion hook
+function AiSuggestionWrapper({ taskCount }: { taskCount: number }) {
+  const { useAiSuggestion } = require("@/hooks/useAiSuggestion");
+  const { suggestion, loading, refresh } = useAiSuggestion(taskCount);
+  const AiSuggestionComp = require("@/components/AiSuggestion").default;
+  return <AiSuggestionComp tip={suggestion} loading={loading} onRefresh={refresh} />;
+}
 
 export default Dashboard;

@@ -147,10 +147,16 @@
     box-shadow: 0 8px 32px -8px hsl(234 85% 65% / 0.1);
   }
 
+  /* Lightweight card variant for scrolling lists — no blur */
+  .glass-card-lite {
+    background: hsl(var(--glass-bg));
+    border: 1px solid hsl(var(--glass-border));
+    border-radius: var(--radius);
+    box-shadow: 0 4px 16px -4px hsl(234 85% 65% / 0.06);
+  }
+
   .glass-input {
     background: hsl(var(--glass-bg));
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     border: 1px solid hsl(var(--glass-border));
   }
 
