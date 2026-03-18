@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
-  Bell, ListTodo, TrendingUp, Target, Zap, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, BarChart3, StickyNote, Save, X
+import { 
+  Moon, Sun, LogOut, UserCircle, CalendarDays, 
+  Bell, ListTodo, TrendingUp, Target, ChevronRight, Clock, CheckCircle2, Plus, RefreshCw, StickyNote, Save, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import FeedbackDialog from "@/components/FeedbackDialog";
