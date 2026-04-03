@@ -94,6 +94,7 @@ const MyTasks = () => {
         completed: !!t.completed,
         note: (t as any).note || null,
         alarm_enabled: (t as any).alarm_enabled !== false,
+        repeat: ((t as any).repeat as Task["repeat"]) || "none",
         missedCount: (t as any).missed_count ?? 0,
       }));
 
