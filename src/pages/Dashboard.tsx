@@ -228,7 +228,7 @@ const Dashboard = () => {
         )}
 
         {/* ─── Quick Actions ─── */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }} className="mb-5 grid grid-cols-2 gap-3">
+        <div className="mb-5 grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate("/tasks")}
             className="glass-card group flex items-center gap-3 bg-gradient-to-br from-primary/15 to-primary/5 px-4 py-3.5 transition-shadow hover:shadow-elevated"
@@ -250,7 +250,7 @@ const Dashboard = () => {
             </div>
             <span className="text-sm font-semibold text-foreground">Quick Notes</span>
           </button>
-        </motion.div>
+        </div>
 
         {/* ─── Progress (Compact) ─── */}
         {!focusMode && (
