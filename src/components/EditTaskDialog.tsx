@@ -35,6 +35,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
       setCategory(task.category);
       setNote(task.note || "");
       setAlarmEnabled(task.alarm_enabled !== false);
+      setRepeat(task.repeat || "none");
     }
     setOpen(isOpen);
   };
