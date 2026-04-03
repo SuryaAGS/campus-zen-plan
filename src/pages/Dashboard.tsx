@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
-import { motion } from "framer-motion";
 import {
   Moon, Sun, LogOut, UserCircle, CalendarDays,
   Bell, ListTodo, TrendingUp, Target, Clock, CheckCircle2,
@@ -169,7 +168,7 @@ const Dashboard = () => {
 
       <div className="container mx-auto max-w-lg px-4 pb-28 pt-16">
         {/* ─── Header: Greeting + Date + Motivation ─── */}
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="mb-6">
+        <div className="mb-6">
           <div className="flex items-center gap-3 mb-1">
             <img src={appIcon} alt="Tasks To Do" className="h-10 w-10 drop-shadow-md" />
             <div>
@@ -180,7 +179,6 @@ const Dashboard = () => {
             </div>
           </div>
           <p className="mt-2 text-sm italic text-muted-foreground/80">"{getMotivation()}"</p>
-          {/* Streak + Focus toggle */}
           <div className="mt-3 flex items-center gap-3">
             {streak.current > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-semibold text-orange-600 dark:text-orange-400">
@@ -197,17 +195,16 @@ const Dashboard = () => {
               {focusMode ? "Focus On" : "Focus Mode"}
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* ─── Today Focus ─── */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.2 }} className="mb-5">
+        <div className="mb-5">
           <TodayFocus tasks={tasks} onComplete={completeTask} onViewAll={() => navigate("/my-tasks?filter=today")} />
-        </motion.div>
+        </div>
 
         {/* ─── Quick Summary Cards ─── */}
         {!focusMode && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.2 }} className="mb-5">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {[
                 { label: "Pending", value: pending.length, icon: ListTodo, color: "text-primary", bg: "bg-primary/10", filter: "pending" },
                 { label: "Completed", value: completed.length, icon: CheckCircle2, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", filter: "completed" },
@@ -227,11 +224,10 @@ const Dashboard = () => {
                 </button>
               ))}
             </div>
-          </motion.div>
         )}
 
         {/* ─── Quick Actions ─── */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15, duration: 0.2 }} className="mb-5 grid grid-cols-2 gap-3">
+        <div className="mb-5 grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate("/tasks")}
             className="glass-card group flex items-center gap-3 bg-gradient-to-br from-primary/15 to-primary/5 px-4 py-3.5 transition-shadow hover:shadow-elevated"
@@ -253,12 +249,11 @@ const Dashboard = () => {
             </div>
             <span className="text-sm font-semibold text-foreground">Quick Notes</span>
           </button>
-        </motion.div>
+        </div>
 
         {/* ─── Progress (Compact) ─── */}
         {!focusMode && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.2 }} className="mb-5">
-            <div className="glass-card p-4">
+          <div className="glass-card p-4">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15">
@@ -271,7 +266,6 @@ const Dashboard = () => {
               <Progress value={progressPercent} className="h-2" />
               <p className="mt-1.5 text-[11px] text-muted-foreground">{completed.length} of {tasks.length} tasks completed</p>
             </div>
-          </motion.div>
         )}
 
         {/* ─── Daily Productivity Score (compact) ─── */}
@@ -384,16 +378,12 @@ const Dashboard = () => {
       </div>
 
       {/* FAB */}
-      <motion.button
+      <button
         onClick={() => navigate("/tasks")}
-        className="fixed bottom-6 right-6 z-50 glass-card flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 shadow-elevated"
-        whileTap={{ scale: 0.9 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.3 }}
+        className="fixed bottom-6 right-6 z-50 glass-card flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 shadow-elevated active:scale-90 transition-transform"
       >
         <Plus size={24} className="text-foreground" />
-      </motion.button>
+      </button>
     </div>
   );
 };

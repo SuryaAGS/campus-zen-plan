@@ -207,11 +207,11 @@ Deno.serve(async (req) => {
             supabaseUrl
           );
           sentCount++;
-        } catch (err) {
+        } catch (err: unknown) {
           console.error(`Failed to send to ${sub.endpoint}:`, err);
           errors.push(sub.endpoint);
-
-          if (err.message?.includes("410") || err.message?.includes("expired")) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          if (errMsg.includes("410") || errMsg.includes("expired")) {
             await supabase.from("push_subscriptions").delete().eq("id", sub.id);
           }
         }
@@ -222,10 +222,10 @@ Deno.serve(async (req) => {
       JSON.stringify({ message: "Notifications sent", sent: sentCount, errors: errors.length }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in send-task-reminders:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
@@ -292,14 +292,14 @@ async function sendPushNotification(
   
   const encryptionKey = await crypto.subtle.importKey(
     "raw",
-    contentEncryptionKey,
+    contentEncryptionKey as ArrayBuffer,
     { name: "AES-GCM" },
     false,
     ["encrypt"]
   );
   
   const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: nonce },
+    { name: "AES-GCM", iv: new Uint8Array(nonce as ArrayBuffer) },
     encryptionKey,
     paddedPayload
   );
@@ -397,7 +397,7 @@ async function importPublicKey(base64: string): Promise<CryptoKey> {
   const bytes = base64UrlDecode(base64);
   return crypto.subtle.importKey(
     "raw",
-    bytes,
+    bytes.buffer as ArrayBuffer,
     { name: "ECDH", namedCurve: "P-256" },
     true,
     []
@@ -412,9 +412,9 @@ function base64UrlDecode(str: string): Uint8Array {
 }
 
 async function hkdf(ikm: Uint8Array, salt: Uint8Array, info: Uint8Array, length: number): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", ikm, { name: "HKDF" }, false, ["deriveBits"]);
+  const key = await crypto.subtle.importKey("raw", ikm.buffer as ArrayBuffer, { name: "HKDF" }, false, ["deriveBits"]);
   const derived = await crypto.subtle.deriveBits(
-    { name: "HKDF", hash: "SHA-256", salt, info },
+    { name: "HKDF", hash: "SHA-256", salt: salt.buffer as ArrayBuffer, info: info.buffer as ArrayBuffer },
     key,
     length * 8
   );

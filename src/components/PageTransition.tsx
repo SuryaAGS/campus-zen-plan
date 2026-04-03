@@ -6,28 +6,14 @@ interface PageTransitionProps {
 }
 
 const pageVariants = {
-  initial: {
-    opacity: 0,
-    x: 20,
-    scale: 0.98,
-  },
+  initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    x: 0,
-    scale: 1,
-    transition: {
-      duration: 0.3,
-      ease: "easeOut" as const,
-    },
+    transition: { duration: 0.15, ease: "easeOut" as const },
   },
   exit: {
     opacity: 0,
-    x: -20,
-    scale: 0.98,
-    transition: {
-      duration: 0.2,
-      ease: "easeOut" as const,
-    },
+    transition: { duration: 0.1, ease: "easeOut" as const },
   },
 };
 
