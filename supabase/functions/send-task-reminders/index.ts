@@ -292,7 +292,7 @@ async function sendPushNotification(
   
   const encryptionKey = await crypto.subtle.importKey(
     "raw",
-    contentEncryptionKey,
+    contentEncryptionKey as ArrayBuffer,
     { name: "AES-GCM" },
     false,
     ["encrypt"]
