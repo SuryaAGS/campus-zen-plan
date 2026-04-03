@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { motion } from "framer-motion";
-import { Check, Trash2, Undo2, Bell, BellOff } from "lucide-react";
+import { Check, Trash2, Undo2, Bell, BellOff, Repeat } from "lucide-react";
 import { Task } from "@/types/task";
 import { getCategoryColor, getCategoryEmoji } from "@/lib/categoryColors";
 import EditTaskDialog from "@/components/EditTaskDialog";
