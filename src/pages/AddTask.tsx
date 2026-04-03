@@ -70,6 +70,7 @@ const AddTask = () => {
         category,
         note: note || null,
         alarm_enabled: alarmEnabled,
+        repeat,
       } as any);
       if (error) {
         toast.error("Failed to add task");
