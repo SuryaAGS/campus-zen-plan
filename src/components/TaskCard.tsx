@@ -72,6 +72,11 @@ const TaskCard = memo(
                 {getCategoryEmoji(task.category)} {task.category}
               </span>
               <span className="text-muted-foreground">{task.date}</span>
+              {task.repeat && task.repeat !== "none" && (
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                  <Repeat size={10} /> {task.repeat}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex gap-1.5 flex-shrink-0 ml-2">
