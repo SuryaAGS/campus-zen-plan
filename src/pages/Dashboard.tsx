@@ -199,9 +199,9 @@ const Dashboard = () => {
         </div>
 
         {/* ─── Today Focus ─── */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.2 }} className="mb-5">
+        <div className="mb-5">
           <TodayFocus tasks={tasks} onComplete={completeTask} onViewAll={() => navigate("/my-tasks?filter=today")} />
-        </motion.div>
+        </div>
 
         {/* ─── Quick Summary Cards ─── */}
         {!focusMode && (
