@@ -140,6 +140,26 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
             </div>
           </div>
           <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Repeat</label>
+            <div className="flex gap-2">
+              {([["none", "None"], ["daily", "Daily"], ["weekly", "Weekly"]] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setRepeat(val as RepeatOption)}
+                  className={`flex-1 inline-flex items-center justify-center gap-1 rounded-xl px-2 py-2 text-xs font-medium transition-all ${
+                    repeat === val
+                      ? "bg-primary text-primary-foreground"
+                      : "glass text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {val !== "none" && <Repeat size={12} />}
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
             <label className="mb-1 block text-xs font-medium text-muted-foreground">Note (optional)</label>
             <textarea
               value={note}
