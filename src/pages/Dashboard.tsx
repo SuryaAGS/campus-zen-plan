@@ -379,16 +379,12 @@ const Dashboard = () => {
       </div>
 
       {/* FAB */}
-      <motion.button
+      <button
         onClick={() => navigate("/tasks")}
-        className="fixed bottom-6 right-6 z-50 glass-card flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 shadow-elevated"
-        whileTap={{ scale: 0.9 }}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.3 }}
+        className="fixed bottom-6 right-6 z-50 glass-card flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 shadow-elevated active:scale-90 transition-transform"
       >
         <Plus size={24} className="text-foreground" />
-      </motion.button>
+      </button>
     </div>
   );
 };
