@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, ArrowLeft, Eye, Bell, BellOff } from "lucide-react";
+import { Plus, ArrowLeft, Eye, Bell, BellOff, Repeat } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Task } from "@/types/task";
+import { Task, RepeatOption } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +20,7 @@ const AddTask = () => {
   const [adding, setAdding] = useState(false);
   const [note, setNote] = useState("");
   const [alarmEnabled, setAlarmEnabled] = useState(true);
+  const [repeat, setRepeat] = useState<RepeatOption>("none");
 
   const findNextFreeSlot = async (): Promise<string> => {
     const today = new Date().toISOString().split("T")[0];
@@ -69,6 +70,7 @@ const AddTask = () => {
         category,
         note: note || null,
         alarm_enabled: alarmEnabled,
+        repeat,
       } as any);
       if (error) {
         toast.error("Failed to add task");
@@ -80,6 +82,7 @@ const AddTask = () => {
       setTime("");
       setNote("");
       setAlarmEnabled(true);
+      setRepeat("none");
     } catch {
       toast.error("Failed to add task");
     } finally {
@@ -220,6 +223,28 @@ const AddTask = () => {
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Repeat Option */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-foreground">Repeat</label>
+              <div className="flex gap-2">
+                {([["none", "No Repeat"], ["daily", "Daily"], ["weekly", "Weekly"]] as const).map(([val, label]) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => setRepeat(val as RepeatOption)}
+                    className={`flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                      repeat === val
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "glass text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {val !== "none" && <Repeat size={14} />}
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
 

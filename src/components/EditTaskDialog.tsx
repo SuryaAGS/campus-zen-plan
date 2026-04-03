@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Task } from "@/types/task";
-import { Pencil, Bell, BellOff } from "lucide-react";
+import { Task, RepeatOption } from "@/types/task";
+import { Pencil, Bell, BellOff, Repeat } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
 interface EditTaskDialogProps {
   task: Task;
   allCategories: string[];
-  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean }) => void;
+  onSave: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean; repeat?: RepeatOption }) => void;
 }
 
 const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) => {
@@ -24,6 +24,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
   const [category, setCategory] = useState<string>(task.category);
   const [note, setNote] = useState(task.note || "");
   const [alarmEnabled, setAlarmEnabled] = useState(task.alarm_enabled !== false);
+  const [repeat, setRepeat] = useState<RepeatOption>(task.repeat || "none");
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
@@ -34,13 +35,14 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
       setCategory(task.category);
       setNote(task.note || "");
       setAlarmEnabled(task.alarm_enabled !== false);
+      setRepeat(task.repeat || "none");
     }
     setOpen(isOpen);
   };
 
   const handleSave = () => {
     if (!title || !date) return;
-    onSave(task.id, { title, date, time: time || null, priority, category, note: note || null, alarm_enabled: alarmEnabled });
+    onSave(task.id, { title, date, time: time || null, priority, category, note: note || null, alarm_enabled: alarmEnabled, repeat });
     setOpen(false);
   };
 
@@ -135,6 +137,26 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Repeat</label>
+            <div className="flex gap-2">
+              {([["none", "None"], ["daily", "Daily"], ["weekly", "Weekly"]] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setRepeat(val as RepeatOption)}
+                  className={`flex-1 inline-flex items-center justify-center gap-1 rounded-xl px-2 py-2 text-xs font-medium transition-all ${
+                    repeat === val
+                      ? "bg-primary text-primary-foreground"
+                      : "glass text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {val !== "none" && <Repeat size={12} />}
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
           <div>

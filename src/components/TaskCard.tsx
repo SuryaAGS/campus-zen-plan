@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import { motion } from "framer-motion";
-import { Check, Trash2, Undo2, Bell, BellOff } from "lucide-react";
+import { Check, Trash2, Undo2, Bell, BellOff, Repeat } from "lucide-react";
 import { Task } from "@/types/task";
 import { getCategoryColor, getCategoryEmoji } from "@/lib/categoryColors";
 import EditTaskDialog from "@/components/EditTaskDialog";
@@ -10,7 +10,7 @@ interface TaskCardProps {
   index: number;
   onComplete: (id: string) => void;
   onUncomplete?: (id: string) => void;
-  onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean }) => void;
+  onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean; repeat?: string }) => void;
   onDelete: (id: string) => void;
   onToggleAlarm?: (id: string, enabled: boolean) => void;
   allCategories: string[];
@@ -72,6 +72,11 @@ const TaskCard = memo(
                 {getCategoryEmoji(task.category)} {task.category}
               </span>
               <span className="text-muted-foreground">{task.date}</span>
+              {task.repeat && task.repeat !== "none" && (
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                  <Repeat size={10} /> {task.repeat}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex gap-1.5 flex-shrink-0 ml-2">
@@ -130,6 +135,7 @@ const TaskCard = memo(
     prev.task.category === next.task.category &&
     prev.task.note === next.task.note &&
     prev.task.alarm_enabled === next.task.alarm_enabled &&
+    prev.task.repeat === next.task.repeat &&
     prev.index === next.index
 );
 

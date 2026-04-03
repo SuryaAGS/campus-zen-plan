@@ -94,6 +94,7 @@ const MyTasks = () => {
         completed: !!t.completed,
         note: (t as any).note || null,
         alarm_enabled: (t as any).alarm_enabled !== false,
+        repeat: ((t as any).repeat as Task["repeat"]) || "none",
         missedCount: (t as any).missed_count ?? 0,
       }));
 
@@ -165,9 +166,31 @@ const MyTasks = () => {
 
   const completeTask = async (id: string) => {
     try {
+      const task = tasks.find(t => t.id === id);
       const { error } = await supabase.from("tasks").update({ completed: true }).eq("id", id);
       if (error) { toast.error("Failed to complete task"); return; }
       recordCompletion();
+
+      // Auto-create next occurrence for repeating tasks
+      if (task && task.repeat && task.repeat !== "none" && user) {
+        const nextDate = new Date(task.date);
+        if (task.repeat === "daily") nextDate.setDate(nextDate.getDate() + 1);
+        else if (task.repeat === "weekly") nextDate.setDate(nextDate.getDate() + 7);
+
+        await supabase.from("tasks").insert({
+          user_id: user.id,
+          title: task.title,
+          date: nextDate.toISOString().split("T")[0],
+          time: task.time,
+          priority: task.priority,
+          category: task.category,
+          note: task.note || null,
+          alarm_enabled: task.alarm_enabled !== false,
+          repeat: task.repeat,
+        } as any);
+        toast.info(`🔁 Next "${task.title}" scheduled for ${nextDate.toLocaleDateString()}`);
+      }
+
       try {
         confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 }, colors: ["#667eea", "#764ba2", "#36d1dc", "#5b86e5"] });
       } catch {}
