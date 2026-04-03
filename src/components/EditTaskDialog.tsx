@@ -24,6 +24,7 @@ const EditTaskDialog = ({ task, allCategories, onSave }: EditTaskDialogProps) =>
   const [category, setCategory] = useState<string>(task.category);
   const [note, setNote] = useState(task.note || "");
   const [alarmEnabled, setAlarmEnabled] = useState(task.alarm_enabled !== false);
+  const [repeat, setRepeat] = useState<RepeatOption>(task.repeat || "none");
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
