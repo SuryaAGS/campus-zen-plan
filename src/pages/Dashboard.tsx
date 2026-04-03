@@ -205,8 +205,7 @@ const Dashboard = () => {
 
         {/* ─── Quick Summary Cards ─── */}
         {!focusMode && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1, duration: 0.2 }} className="mb-5">
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
               {[
                 { label: "Pending", value: pending.length, icon: ListTodo, color: "text-primary", bg: "bg-primary/10", filter: "pending" },
                 { label: "Completed", value: completed.length, icon: CheckCircle2, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10", filter: "completed" },
@@ -226,7 +225,6 @@ const Dashboard = () => {
                 </button>
               ))}
             </div>
-          </motion.div>
         )}
 
         {/* ─── Quick Actions ─── */}
