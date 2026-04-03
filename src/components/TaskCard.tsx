@@ -10,7 +10,7 @@ interface TaskCardProps {
   index: number;
   onComplete: (id: string) => void;
   onUncomplete?: (id: string) => void;
-  onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean }) => void;
+  onEdit: (id: string, updates: { title: string; date: string; time: string | null; priority: string; category: string; note?: string | null; alarm_enabled?: boolean; repeat?: string }) => void;
   onDelete: (id: string) => void;
   onToggleAlarm?: (id: string, enabled: boolean) => void;
   allCategories: string[];
