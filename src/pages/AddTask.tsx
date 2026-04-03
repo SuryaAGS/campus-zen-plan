@@ -20,6 +20,7 @@ const AddTask = () => {
   const [adding, setAdding] = useState(false);
   const [note, setNote] = useState("");
   const [alarmEnabled, setAlarmEnabled] = useState(true);
+  const [repeat, setRepeat] = useState<RepeatOption>("none");
 
   const findNextFreeSlot = async (): Promise<string> => {
     const today = new Date().toISOString().split("T")[0];
