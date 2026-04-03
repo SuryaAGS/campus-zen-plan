@@ -82,6 +82,7 @@ const AddTask = () => {
       setTime("");
       setNote("");
       setAlarmEnabled(true);
+      setRepeat("none");
     } catch {
       toast.error("Failed to add task");
     } finally {
