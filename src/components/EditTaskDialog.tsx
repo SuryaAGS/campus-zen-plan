@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Task, RepeatOption } from "@/types/task";
-import { Pencil, Bell, BellOff } from "lucide-react";
+import { Pencil, Bell, BellOff, Repeat } from "lucide-react";
 import {
   Dialog,
   DialogContent,
