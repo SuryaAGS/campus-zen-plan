@@ -207,11 +207,11 @@ Deno.serve(async (req) => {
             supabaseUrl
           );
           sentCount++;
-        } catch (err) {
+        } catch (err: unknown) {
           console.error(`Failed to send to ${sub.endpoint}:`, err);
           errors.push(sub.endpoint);
-
-          if (err.message?.includes("410") || err.message?.includes("expired")) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          if (errMsg.includes("410") || errMsg.includes("expired")) {
             await supabase.from("push_subscriptions").delete().eq("id", sub.id);
           }
         }
