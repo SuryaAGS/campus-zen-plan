@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, ArrowLeft, Eye, Bell, BellOff } from "lucide-react";
+import { Plus, ArrowLeft, Eye, Bell, BellOff, Repeat } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Task } from "@/types/task";
+import { Task, RepeatOption } from "@/types/task";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
