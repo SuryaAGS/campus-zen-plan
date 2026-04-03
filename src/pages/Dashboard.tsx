@@ -113,6 +113,7 @@ const Dashboard = () => {
       completed: !!t.completed,
       alarm_enabled: (t as any).alarm_enabled !== false,
       note: (t as any).note || null,
+      repeat: ((t as any).repeat as Task["repeat"]) || "none",
       missedCount: (t as any).missed_count ?? 0,
     }));
 
