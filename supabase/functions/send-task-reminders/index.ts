@@ -299,7 +299,7 @@ async function sendPushNotification(
   );
   
   const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: nonce },
+    { name: "AES-GCM", iv: new Uint8Array(nonce as ArrayBuffer) },
     encryptionKey,
     paddedPayload
   );
