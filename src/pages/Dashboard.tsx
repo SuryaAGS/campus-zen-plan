@@ -254,8 +254,7 @@ const Dashboard = () => {
 
         {/* ─── Progress (Compact) ─── */}
         {!focusMode && (
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.2 }} className="mb-5">
-            <div className="glass-card p-4">
+          <div className="glass-card p-4">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/15">
@@ -268,7 +267,6 @@ const Dashboard = () => {
               <Progress value={progressPercent} className="h-2" />
               <p className="mt-1.5 text-[11px] text-muted-foreground">{completed.length} of {tasks.length} tasks completed</p>
             </div>
-          </motion.div>
         )}
 
         {/* ─── Daily Productivity Score (compact) ─── */}
