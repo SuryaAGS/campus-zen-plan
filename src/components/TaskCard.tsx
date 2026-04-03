@@ -135,6 +135,7 @@ const TaskCard = memo(
     prev.task.category === next.task.category &&
     prev.task.note === next.task.note &&
     prev.task.alarm_enabled === next.task.alarm_enabled &&
+    prev.task.repeat === next.task.repeat &&
     prev.index === next.index
 );
 
