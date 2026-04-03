@@ -1,0 +1,1 @@
+ALTER TABLE public.tasks ADD COLUMN repeat text NOT NULL DEFAULT 'none';
