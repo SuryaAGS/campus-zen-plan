@@ -169,7 +169,7 @@ const Dashboard = () => {
 
       <div className="container mx-auto max-w-lg px-4 pb-28 pt-16">
         {/* ─── Header: Greeting + Date + Motivation ─── */}
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="mb-6">
+        <div className="mb-6">
           <div className="flex items-center gap-3 mb-1">
             <img src={appIcon} alt="Tasks To Do" className="h-10 w-10 drop-shadow-md" />
             <div>
@@ -180,7 +180,6 @@ const Dashboard = () => {
             </div>
           </div>
           <p className="mt-2 text-sm italic text-muted-foreground/80">"{getMotivation()}"</p>
-          {/* Streak + Focus toggle */}
           <div className="mt-3 flex items-center gap-3">
             {streak.current > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-semibold text-orange-600 dark:text-orange-400">
@@ -197,7 +196,7 @@ const Dashboard = () => {
               {focusMode ? "Focus On" : "Focus Mode"}
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* ─── Today Focus ─── */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05, duration: 0.2 }} className="mb-5">
