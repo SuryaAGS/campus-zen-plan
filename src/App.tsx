@@ -37,25 +37,21 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AnimatedRoutes() {
-  const location = useLocation();
-  
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<ProtectedRoute><PageTransition><Index /></PageTransition></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><PageTransition><Dashboard /></PageTransition></ProtectedRoute>} />
-        <Route path="/tasks" element={<ProtectedRoute><PageTransition><AddTask /></PageTransition></ProtectedRoute>} />
-        <Route path="/my-tasks" element={<ProtectedRoute><PageTransition><MyTasks /></PageTransition></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><PageTransition><Profile /></PageTransition></ProtectedRoute>} />
-        <Route path="/categories" element={<ProtectedRoute><PageTransition><Categories /></PageTransition></ProtectedRoute>} />
-        <Route path="/calendar" element={<ProtectedRoute><PageTransition><CalendarView /></PageTransition></ProtectedRoute>} />
-        <Route path="/notifications" element={<ProtectedRoute><PageTransition><NotificationSettings /></PageTransition></ProtectedRoute>} />
-        <Route path="/install" element={<PageTransition><Install /></PageTransition>} />
-        <Route path="/auth" element={<AuthRoute><PageTransition><Auth /></PageTransition></AuthRoute>} />
-        <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-      </Routes>
-    </AnimatePresence>
+    <Routes>
+      <Route path="/" element={<ProtectedRoute><PageTransition><Index /></PageTransition></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><PageTransition><Dashboard /></PageTransition></ProtectedRoute>} />
+      <Route path="/tasks" element={<ProtectedRoute><PageTransition><AddTask /></PageTransition></ProtectedRoute>} />
+      <Route path="/my-tasks" element={<ProtectedRoute><PageTransition><MyTasks /></PageTransition></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><PageTransition><Profile /></PageTransition></ProtectedRoute>} />
+      <Route path="/categories" element={<ProtectedRoute><PageTransition><Categories /></PageTransition></ProtectedRoute>} />
+      <Route path="/calendar" element={<ProtectedRoute><PageTransition><CalendarView /></PageTransition></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><PageTransition><NotificationSettings /></PageTransition></ProtectedRoute>} />
+      <Route path="/install" element={<PageTransition><Install /></PageTransition>} />
+      <Route path="/auth" element={<AuthRoute><PageTransition><Auth /></PageTransition></AuthRoute>} />
+      <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+      <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+    </Routes>
   );
 }
 
