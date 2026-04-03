@@ -397,7 +397,7 @@ async function importPublicKey(base64: string): Promise<CryptoKey> {
   const bytes = base64UrlDecode(base64);
   return crypto.subtle.importKey(
     "raw",
-    bytes,
+    bytes.buffer as ArrayBuffer,
     { name: "ECDH", namedCurve: "P-256" },
     true,
     []
